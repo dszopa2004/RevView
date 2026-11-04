@@ -6,8 +6,8 @@ license.workspace = true
 build = "build.rs"
 
 [dependencies]
-roadpulse-core = { path = "../roadpulse-core" }
-roadpulse-obd = { path = "../roadpulse-obd" }
+revview-core = { path = "../revview-core" }
+revview-obd = { path = "../revview-obd" }
 slint = "1"
 
 [build-dependencies]

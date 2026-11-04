@@ -4,5 +4,5 @@ version.workspace = true
 edition.workspace = true
 
 [dependencies]
-roadpulse-core = { path = "../roadpulse-core" }
+revview-core = { path = "../revview-core" }
 serialport = "4"
