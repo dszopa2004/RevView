@@ -1,6 +1,12 @@
-[package]
-name = "revview"
+[workspace]
+resolver = "2"
+members = [
+    "crates/revview-core",
+    "crates/revview-obd",
+    "crates/revview-ui",
+]
+
+[workspace.package]
 version = "0.1.0"
 edition = "2024"
-
-[dependencies]
+license = "MIT"
