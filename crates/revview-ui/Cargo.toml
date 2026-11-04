@@ -3,5 +3,12 @@ name = "revview-ui"
 version.workspace = true
 edition.workspace = true
 license.workspace = true
+build = "build.rs"
 
 [dependencies]
+roadpulse-core = { path = "../roadpulse-core" }
+roadpulse-obd = { path = "../roadpulse-obd" }
+slint = "1"
+
+[build-dependencies]
+slint-build = "1"
