@@ -11,7 +11,7 @@ static BAUD_RATE: u32 = 9600;
 pub fn open_connection() -> Result<Box<dyn SerialPort>> {
     // Open the port
     let port = serialport::new(PORT_NAME, BAUD_RATE)
-        .timeout(Duration::from_millis(10))
+        .timeout(Duration::from_millis(500))
         .open()?;
 
     Ok(port)
@@ -29,16 +29,38 @@ pub fn send_command(port: &mut impl Write, command: &str) -> io::Result<()> {
 }
 
 // Reads the adapter's response
-pub fn read_response(port: &mut impl Read) -> io::Result<[u8; 4]> {
-    // Allocate the storage first
-    let mut buffer = [0u8; 4];
+// Reads the adapter's response until the '>' prompt is found
+pub fn read_response(port: &mut impl Read) -> io::Result<String> {
+    let mut full_buffer = Vec::new();
+    let mut single_byte = [0u8; 1]; // Read 1 byte at a time to check for the delimiter
 
-    // Pass a mutable reference.
-    // If successful, `_` is just `()`, and `buffer` now holds your data.
-    port.read_exact(&mut buffer)?;
+    loop {
+        match port.read_exact(&mut single_byte) {
+            Ok(()) => {
+                let byte = single_byte[0];
+                full_buffer.push(byte);
 
-    // Return your populated buffer
-    Ok(buffer)
+                // Stop reading immediately once the prompt character is found
+                if byte == b'>' {
+                    break;
+                }
+            }
+            Err(ref e) if e.kind() == io::ErrorKind::TimedOut => {
+                // If a timeout happens before we see '>', return what we have so far
+                if full_buffer.is_empty() {
+                    return Err(io::Error::new(
+                        io::ErrorKind::TimedOut,
+                        "Read timed out with no data",
+                    ));
+                }
+                break;
+            }
+            Err(e) => return Err(e),
+        }
+    }
+
+    // Convert the raw bytes into a valid UTF-8 String
+    String::from_utf8(full_buffer).map_err(|e| io::Error::new(io::ErrorKind::InvalidData, e))
 }
 
 // Closes the connection (usually automatic when dropped)
