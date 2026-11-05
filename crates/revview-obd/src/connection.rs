@@ -1,7 +1,7 @@
 // Manages the serial connection, including opening the port, sending requests, and receiving responses.
 
 use serialport::{Result, SerialPort};
-use std::io::{self, ErrorKind, Write};
+use std::io::{self, ErrorKind, Read, Write};
 use std::time::Duration;
 
 static PORT_NAME: &str = "/dev/ttyUSB0";
@@ -29,13 +29,16 @@ pub fn send_command(port: &mut impl Write, command: &str) -> io::Result<()> {
 }
 
 // Reads the adapter's response
-pub fn read_response(port: &mut dyn SerialPort, buffer: &mut [u8]) -> io::Result<usize> {
-    let bytes_read = port.read(buffer)?; // The ? operator extracts the usize or returns the error immediately
+pub fn read_response(port: &mut impl Read) -> io::Result<[u8; 4]> {
+    // Allocate the storage first
+    let mut buffer = [0u8; 4];
 
-    // Perform additional logic here if needed
-    println!("Read called successfully inside function.");
+    // Pass a mutable reference.
+    // If successful, `_` is just `()`, and `buffer` now holds your data.
+    port.read_exact(&mut buffer)?;
 
-    Ok(bytes_read)
+    // Return your populated buffer
+    Ok(buffer)
 }
 
 // Closes the connection (usually automatic when dropped)
