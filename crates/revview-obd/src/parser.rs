@@ -1,3 +1,5 @@
+// Interprets hexadecimal responses, validates their format, and converts data bytes into measurements.
+
 // Parses the serial response for RPMs and returns its numerical value
 pub fn parse_rpm_response(response: &str) -> u16 {
     // todo: extract A and B bits from response

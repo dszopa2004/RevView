@@ -1,3 +1,5 @@
+// Defines OBD-II requests and adapter commands, including their associated PIDs.
+
 // `\r` tells the adapter that the command is finished
 const RPM_COMMAND: &str = "010C\r";
 const SPEED_COMMAND: &str = "010D\r";

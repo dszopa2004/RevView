@@ -1,3 +1,5 @@
+// Declares the OBD-II modules and exposes the functionality other crates need.
+
 pub mod commands;
 pub mod connection;
 pub mod parser;
