@@ -1,13 +1,16 @@
 // Application entry point. Initializes the UI and starts the application.
 
+use revview_core::VehicleTelemetry;
 use revview_obd::{
     commands,
     connection::{open_connection, read_response, send_command},
+    parser,
 };
 
 slint::include_modules!();
 
 fn main() {
+    let mut telemetry = VehicleTelemetry::default();
     // -> Result<(), slint::PlatformError>
     //let app = Dashboard::new()?;
     //app.run()
@@ -28,7 +31,9 @@ fn main() {
                 Ok(response) => {
                     println!("Success! Received bytes: {:?}", response);
 
-                    // TODO: Pass this data to Slint later
+                    telemetry.rpm = parser::parse_rpm_response(&response);
+
+                    println!("RPMs: {:?}", telemetry.rpm);
                 }
                 Err(e) => {
                     eprintln!("Error reading from port: {}", e);

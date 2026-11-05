@@ -1,14 +1,15 @@
 // Interprets hexadecimal responses, validates their format, and converts data bytes into measurements.
 
 // Parses the serial response for RPMs and returns its numerical value
-pub fn parse_rpm_response(response: &str) -> u16 {
-    // todo: extract A and B bits from response
-    let a: u8 = u8::from_str_radix("1F", 16).unwrap();
-    let b: u8 = u8::from_str_radix("40", 16).unwrap();
+pub fn parse_rpm_response(response: &str) -> Option<u16> {
+    let bytes: Vec<&str> = response.split_whitespace().collect();
 
-    let rpm: u16 = ((256 * a as u16) + b as u16) / 4;
+    let index = bytes.windows(2).position(|window| window == ["41", "0C"])?;
 
-    return rpm as u16;
+    let a = u16::from_str_radix(bytes[index + 2], 16).ok()?;
+    let b = u16::from_str_radix(bytes[index + 3], 16).ok()?;
+
+    Some((a * 256 + b) / 4)
 }
 
 // Parses the serial response for KPH and returns its numerical value
