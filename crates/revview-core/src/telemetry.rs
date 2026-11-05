@@ -1,3 +1,5 @@
+// Defines VehicleTelemetry, the structure holding current vehicle measurements.
+
 #[derive(Debug, Clone, Default)]
 pub struct VehicleTelemetry {
     pub rpm: Option<u16>,

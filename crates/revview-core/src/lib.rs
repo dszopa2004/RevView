@@ -1,3 +1,5 @@
+// Declares public modules and exposes commonly used types to other crates.
+
 pub mod calculations;
 pub mod parameters;
 pub mod telemetry;
