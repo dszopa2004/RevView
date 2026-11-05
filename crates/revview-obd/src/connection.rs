@@ -1,29 +1,20 @@
 // Manages the serial connection, including opening the port, sending requests, and receiving responses.
 
-use serialport::{self, Error};
+use serialport::{Result, SerialPort};
 use std::io::{self, Write};
 use std::time::Duration;
 
-static port_name: &str = "/dev/ttyUSB0";
-static baud_rate: u32 = 9600;
+static PORT_NAME: &str = "/dev/ttyUSB0";
+static BAUD_RATE: u32 = 9600;
 
-// Opens serial connection to /dev/ttyUSB0
-pub fn open_connection() {
+// Opens and returns serial connection to /dev/ttyUSB0
+pub fn open_connection() -> Result<Box<dyn SerialPort>> {
     // Open the port
-    let port = serialport::new(port_name, baud_rate)
+    let port = serialport::new(PORT_NAME, BAUD_RATE)
         .timeout(Duration::from_millis(10))
-        .open();
+        .open()?;
 
-    // Check if port connected successfully
-    match port {
-        Ok(_port) => {
-            println!("Successfully opened port: {}", port_name);
-        }
-        Err(e) => {
-            eprintln!("Failed to open port {}. Error: {}", port_name, e);
-            std::process::exit(1);
-        }
-    }
+    Ok(port)
 }
 
 // Sends a command to the open connection
