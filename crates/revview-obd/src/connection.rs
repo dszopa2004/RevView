@@ -37,20 +37,10 @@ pub fn read_response(port: &mut impl Read) -> io::Result<String> {
                 let byte = single_byte[0];
                 full_buffer.push(byte);
 
-                // Stop reading immediately once the prompt character is found
+                // Stop reading once the prompt character is found
                 if byte == b'>' {
                     break;
                 }
-            }
-            Err(ref e) if e.kind() == io::ErrorKind::TimedOut => {
-                // If a timeout happens before we see '>', return what we have so far
-                if full_buffer.is_empty() {
-                    return Err(io::Error::new(
-                        io::ErrorKind::TimedOut,
-                        "Read timed out with no data",
-                    ));
-                }
-                break;
             }
             Err(e) => return Err(e),
         }
