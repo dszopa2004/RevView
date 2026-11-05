@@ -19,10 +19,7 @@ pub fn open_connection() -> Result<Box<dyn SerialPort>> {
 
 // Sends a command to the open connection
 pub fn send_command(port: &mut impl Write, command: &str) -> io::Result<()> {
-    if let Err(e) = port.write_all(command.as_bytes()) {
-        eprintln!("Failed to write to port: {}", e);
-    }
-
+    port.write_all(command.as_bytes())?;
     port.flush()?;
 
     Ok(())
