@@ -14,7 +14,7 @@ export component Dashboard inherits Window {
     in-out property <float> speed: 0.0;
 
     // --- Telemetry Dashboard ---
-if !root.obd-initialized: Rectangle {
+if root.obd-initialized: Rectangle {
         width: parent.width;
         height: parent.height;
 
@@ -105,7 +105,7 @@ if !root.obd-initialized: Rectangle {
     // --- Telemetry Dashboard
     
     // Error Menu
-    if root.obd-initialized: VerticalLayout {
+    if !root.obd-initialized: VerticalLayout {
         alignment: center;
 
         VerticalBox {

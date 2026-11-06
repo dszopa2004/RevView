@@ -23,39 +23,26 @@ fn main() -> Result<(), slint::PlatformError> {
 
         match open_connection() {
             Ok(mut port) => {
-                let app_copy = app_weak.clone();
-                let _ = slint::invoke_from_event_loop(move || {
-                    if let Some(ui) = app_copy.upgrade() {
-                        ui.set_obd_connected(true); // Set if OBD-II is connected successfully
-                    }
+                update_ui(&app_weak, move |ui| {
+                    ui.set_obd_connected(true);
                 });
                 println!("Successfully opened the port!");
 
                 if let Err(e) = initialize_adapter(&mut port) {
-                    let app_copy = app_weak.clone();
-                    let _ = slint::invoke_from_event_loop(move || {
-                        if let Some(ui) = app_copy.upgrade() {
-                            ui.set_obd_initialized(false); // Set if OBD-II is not initialized successfully
-                        }
+                    update_ui(&app_weak, move |ui| {
+                        ui.set_obd_initialized(false);
                     });
                     eprintln!("Failed to initialize adapter: {}", e);
                     let error_msg = format!("Failed to initialize adapter: {}", e);
 
-                    let app_copy = app_weak.clone();
-                    let _ = slint::invoke_from_event_loop(move || {
-                        if let Some(ui) = app_copy.upgrade() {
-                            ui.set_obd_initialization_error(error_msg.into());
-                        }
+                    update_ui(&app_weak, move |ui| {
+                        ui.set_obd_initialization_error(error_msg.into());
                     });
-
                     return;
                 }
 
-                let app_copy = app_weak.clone();
-                let _ = slint::invoke_from_event_loop(move || {
-                    if let Some(ui) = app_copy.upgrade() {
-                        ui.set_obd_initialized(true); // Set if OBD-II is initialized successfully
-                    }
+                update_ui(&app_weak, move |ui| {
+                    ui.set_obd_initialized(true);
                 });
 
                 println!("Adapter initialized successfully!");
@@ -75,14 +62,10 @@ fn main() -> Result<(), slint::PlatformError> {
                             println!("RPMs: {:?}", telemetry.rpm);
 
                             // Clone weak handle and upgrade it on the UI thread to push updates
-                            let app_copy = app_weak.clone();
                             let current_rpm = telemetry.rpm.unwrap_or(0) as f32;
 
-                            let _ = slint::invoke_from_event_loop(move || {
-                                if let Some(ui) = app_copy.upgrade() {
-                                    // Assigning the RPM data to the Slint property
-                                    ui.set_rpm(current_rpm as f32);
-                                }
+                            update_ui(&app_weak, move |ui| {
+                                ui.set_rpm(current_rpm); // Set RPM property
                             });
                         }
                         Err(e) => {
@@ -95,12 +78,8 @@ fn main() -> Result<(), slint::PlatformError> {
                 }
             }
             Err(e) => {
-                let app_copy = app_weak.clone();
-
-                let _ = slint::invoke_from_event_loop(move || {
-                    if let Some(ui) = app_copy.upgrade() {
-                        ui.set_obd_connected(false); // Set if OBD-II is connected successfully
-                    }
+                update_ui(&app_weak, move |ui| {
+                    ui.set_obd_connected(false);
                 });
                 eprintln!("Failed to open port: {}", e);
             }
@@ -109,4 +88,14 @@ fn main() -> Result<(), slint::PlatformError> {
 
     // Start the event loop on the main thread (blocks here until the window closes)
     app.run()
+}
+
+fn update_ui(app_weak: &slint::Weak<Dashboard>, update: impl FnOnce(Dashboard) + Send + 'static) {
+    let app_weak = app_weak.clone();
+
+    let _ = slint::invoke_from_event_loop(move || {
+        if let Some(ui) = app_weak.upgrade() {
+            update(ui);
+        }
+    });
 }
