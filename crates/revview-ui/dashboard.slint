@@ -9,6 +9,7 @@ export component Dashboard inherits Window {
     // Expose properties that can be set dynamically in code
     in-out property <bool> obd-connected: false;
     in-out property <bool> obd-initialized: false;
+    in-out property <string> obd-initialization-error: "";
     in-out property <float> rpm: 0.0;
     in-out property <float> speed: 0.0;
 
@@ -95,8 +96,8 @@ export component Dashboard inherits Window {
     }
     // --- Telemetry Dashboard
     
-
-    VerticalBox {
+    // Error Menu
+    if !root.obd-initialized: VerticalLayout {
         VerticalBox {
             Text {
                 text: "Could not start dashboard!";
@@ -106,20 +107,41 @@ export component Dashboard inherits Window {
                 vertical-alignment: center;
             }
 
-            Text {
-                text: root.obd-connected ? "OBD-II Connected" : "OBD-II Disconnected";
-                font-size: 14px;
-                color: #4ade80;
-                horizontal-alignment: center;
-                vertical-alignment: center;
+            VerticalBox {
+                spacing: 0px;
+                Text {
+                    text: root.obd-connected ? "OBD-II Connected" : "OBD-II Disconnected";
+                    font-size: 24px;
+                    color: #4ade80;
+                    horizontal-alignment: center;
+                    vertical-alignment: center;
+                }
+
+                Text {
+                    text: root.obd-connected ? "" : "Make sure your OBD-II adapter is plugged in.";
+                    font-size: 12px;
+                    color: #4ade80;
+                    horizontal-alignment: center;
+                    vertical-alignment: center;
+                }
             }
 
-            Text {
-                text: root.obd-initialized ? "OBD-II Initialized" : "OBD-II Uninitialized";
-                font-size: 14px;
-                color: #4ade80;
-                horizontal-alignment: center;
-                vertical-alignment: center;
+            VerticalBox {
+                Text {
+                    text: root.obd-initialized ? "OBD-II Initialized" : "OBD-II Uninitialized";
+                    font-size: 24px;
+                    color: #4ade80;
+                    horizontal-alignment: center;
+                    vertical-alignment: center;
+                }
+
+                Text {
+                    text: obd-initialization-error;
+                    font-size: 24px;
+                    color: #4ade80;
+                    horizontal-alignment: center;
+                    vertical-alignment: center;
+                }
             }
         }
     }

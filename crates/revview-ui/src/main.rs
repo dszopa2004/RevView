@@ -39,6 +39,15 @@ fn main() -> Result<(), slint::PlatformError> {
                         }
                     });
                     eprintln!("Failed to initialize adapter: {}", e);
+                    let error_msg = format!("Failed to initialize adapter: {}", e);
+
+                    let app_copy = app_weak.clone();
+                    let _ = slint::invoke_from_event_loop(move || {
+                        if let Some(ui) = app_copy.upgrade() {
+                            ui.set_obd_initialization_error(error_msg.into());
+                        }
+                    });
+
                     return;
                 }
 
