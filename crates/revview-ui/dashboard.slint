@@ -19,12 +19,12 @@ if !root.obd-initialized: Rectangle {
         height: parent.height;
 
         // --- Main Telemetry Layout ---
-    VerticalLayout {
+        VerticalLayout {
             alignment: center;
             spacing: 12px;
 
             // --- Speed Container ---
-        VerticalBox {
+            VerticalBox {
                 alignment: center;
 
                 HorizontalLayout {
@@ -33,7 +33,7 @@ if !root.obd-initialized: Rectangle {
 
                     Text {
                         text: "\{round(root.speed)}";
-                        font-size: 56px;
+                        font-size: 84px;
                         font-weight: 900;
                         color: #ffffff;
                         vertical-alignment: bottom;
@@ -41,7 +41,7 @@ if !root.obd-initialized: Rectangle {
 
                     Text {
                         text: "Kph";
-                        font-size: 24px;
+                        font-size: 32px;
                         font-weight: 900;
                         color: #ffffff;
                         vertical-alignment: center;
@@ -50,7 +50,7 @@ if !root.obd-initialized: Rectangle {
             }
 
             // --- RPM Container ---
-        VerticalBox {
+            VerticalBox {
                 alignment: center;
 
                 Rectangle {
@@ -90,7 +90,7 @@ if !root.obd-initialized: Rectangle {
         }
 
         // --- Footer ---
-    Text {
+        Text {
             text: "--- RevView ---";
             font-size: 12px;
             font-weight: 800;
