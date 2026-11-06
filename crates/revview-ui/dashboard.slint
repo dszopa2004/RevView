@@ -13,91 +13,99 @@ export component Dashboard inherits Window {
     in-out property <float> rpm: 0.0;
     in-out property <float> speed: 0.0;
 
-    // --- Telemetry Dashboard
-    if root.obd-initialized: VerticalLayout {
-        alignment: center;
-        spacing: 12px;
+    // --- Telemetry Dashboard ---
+if !root.obd-initialized: Rectangle {
+        width: parent.width;
+        height: parent.height;
 
-        // Top Header Bar
-        HorizontalBox {
-            padding: 0;
-            Text {
-                text: "RevView";
-                font-size: 20px;
-                font-weight: 800;
-                color: #00ffcc;
+        // --- Main Telemetry Layout ---
+    VerticalLayout {
+            alignment: center;
+            spacing: 12px;
+
+            // --- Speed Container ---
+        VerticalBox {
+                alignment: center;
+
+                HorizontalLayout {
+                    alignment: center;
+                    spacing: 8px;
+
+                    Text {
+                        text: "\{round(root.speed)}";
+                        font-size: 56px;
+                        font-weight: 900;
+                        color: #ffffff;
+                        vertical-alignment: bottom;
+                    }
+
+                    Text {
+                        text: "Kph";
+                        font-size: 24px;
+                        font-weight: 900;
+                        color: #ffffff;
+                        vertical-alignment: center;
+                    }
+                }
+            }
+
+            // --- RPM Container ---
+        VerticalBox {
+                alignment: center;
+
+                Rectangle {
+                    height: 32px;
+                    background: #2e3748;
+                    border-radius: 4px;
+
+                    Rectangle {
+                        x: 0;
+                        width: parent.width * (root.rpm / 8000.0);
+                        background: root.rpm > 6000.0 ? #ef4444 : #00ffcc;
+                        border-radius: 4px;
+                    }
+                }
+
+                HorizontalLayout {
+                    alignment: center;
+                    spacing: 8px;
+
+                    Text {
+                        text: "\{round(root.rpm)}";
+                        font-size: 48px;
+                        font-weight: 900;
+                        color: root.rpm > 6000.0 ? #ef4444 : #ffffff;
+                        vertical-alignment: bottom;
+                    }
+
+                    Text {
+                        text: "RPM";
+                        font-size: 16px;
+                        font-weight: 900;
+                        color: root.rpm > 6000.0 ? #ef4444 : #ffffff;
+                        vertical-alignment: center;
+                    }
+                }
             }
         }
 
-        // --- Speed Container ---
-        VerticalBox {
-            alignment: center;
+        // --- Footer ---
+    Text {
+            text: "--- RevView ---";
+            font-size: 12px;
+            font-weight: 800;
+            color: #00ffcc;
+            horizontal-alignment: center;
 
-            HorizontalLayout {
-                alignment: center;
-                spacing: 8px; // Space between the texts
-
-                Text {
-                    text: "\{round(root.speed)}";
-                    font-size: 72px;
-                    font-weight: 900;
-                    color: #ffffff;
-                    vertical-alignment: bottom;
-                }
-
-                Text {
-                    text: "Kph";
-                    font-size: 32px;
-                    font-weight: 900;
-                    color: #ffffff;
-                    vertical-alignment: center;
-                }
-            }
-        } // --- Speed Container ---
-
-        // --- RPM Container ---
-        VerticalBox {
-            alignment: center;
-
-            // Simple progress bar
-            Rectangle {
-                height: 32px; // Thickness of progress bar
-                background: #2e3748;
-                border-radius: 4px;
-                Rectangle {
-                    x: 0;
-                    width: parent.width * (root.rpm / 8000.0); // Assuming 8k max RPM
-                            background: root.rpm > 6000.0 ? #ef4444 : #00ffcc;
-                    border-radius: 4px;
-                }
-            }
-
-            HorizontalLayout {
-                alignment: center;
-                spacing: 8px; // Space between the texts
-
-                Text {
-                    text: "\{round(root.rpm)}";
-                    font-size: 48px;
-                    font-weight: 900;
-                    color: root.rpm > 6000.0 ? #ef4444 : #ffffff; // Change to red when approaching redline
-                    vertical-alignment: bottom;
-                }
-
-                Text {
-                    text: "RPM";
-                    font-size: 16px;
-                    font-weight: 900;
-                    color: root.rpm > 6000.0 ? #ef4444 : #ffffff; // Change to red when approaching redline
-                    vertical-alignment: center;
-                }
-            }
-        } // --- RPM Container ---
+            x: 0px;
+            width: parent.width;
+            y: parent.height - self.height - 6px;
+        }
     }
     // --- Telemetry Dashboard
     
     // Error Menu
-    if !root.obd-initialized: VerticalLayout {
+    if root.obd-initialized: VerticalLayout {
         alignment: center;
 
         VerticalBox {
