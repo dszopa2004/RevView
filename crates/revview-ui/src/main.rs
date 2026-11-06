@@ -1,55 +1,77 @@
 // Application entry point. Initializes the UI and starts the application.
 
+use std::{thread, time::Duration};
+
 use revview_core::VehicleTelemetry;
 use revview_obd::{
     commands,
-    connection::{open_connection, initialize_adapter, read_response, send_command},
+    connection::{initialize_adapter, open_connection, read_response, send_command},
     parser,
 };
 
 slint::include_modules!();
 
-fn main() {
-    let mut telemetry = VehicleTelemetry::default();
-    // -> Result<(), slint::PlatformError>
-    //let app = Dashboard::new()?;
-    //app.run()
+fn main() -> Result<(), slint::PlatformError> {
+    let app = Dashboard::new()?;
 
-    // Open connection
-    match open_connection() {
-        Ok(mut port) => {
-            println!("Successfully opened the port!");
+    // Create a weak handle to safely pass across thread boundaries
+    let app_weak = app.as_weak();
 
-            if let Err(e) = initialize_adapter(&mut port) {
-                eprintln!("Failed to initialize adapter: {}", e);
-                return;
-            }
-    
-            println!("Adapter initialized successfully!");
+    // Spawn a background thread to handle the blocking OBD loop
+    thread::spawn(move || {
+        let mut telemetry = VehicleTelemetry::default();
 
-            // Handle the write result
-            if let Err(e) = send_command(&mut port, commands::RPM_COMMAND) {
-                eprintln!("Failed to send command: {}", e);
-                return; // Exit early since we can't read a response to a failed command
-            }
+        match open_connection() {
+            Ok(mut port) => {
+                println!("Successfully opened the port!");
 
-            // Read the response safely
-            match read_response(&mut port) {
-                Ok(response) => {
-                    println!("Success! Received bytes: {:?}", response);
-
-                    telemetry.rpm = parser::parse_rpm_response(&response);
-
-                    println!("RPMs: {:?}", telemetry.rpm);
-                }
-                Err(e) => {
-                    eprintln!("Error reading from port: {}", e);
+                if let Err(e) = initialize_adapter(&mut port) {
+                    eprintln!("Failed to initialize adapter: {}", e);
                     return;
                 }
+
+                println!("Adapter initialized successfully!");
+
+                // Infinite loop to continuously update telemetry while the app runs
+                loop {
+                    if let Err(e) = send_command(&mut port, commands::RPM_COMMAND) {
+                        eprintln!("Failed to send command: {}", e);
+                        thread::sleep(Duration::from_millis(500));
+                        continue;
+                    }
+
+                    match read_response(&mut port) {
+                        Ok(response) => {
+                            println!("Success! Received bytes: {:?}", response);
+                            telemetry.rpm = parser::parse_rpm_response(&response);
+                            println!("RPMs: {:?}", telemetry.rpm);
+
+                            // Clone weak handle and upgrade it on the UI thread to push updates
+                            let app_copy = app_weak.clone();
+                            let current_rpm = telemetry.rpm.unwrap_or(0) as f32;
+
+                            let _ = slint::invoke_from_event_loop(move || {
+                                if let Some(ui) = app_copy.upgrade() {
+                                    // Assigning the RPM data to the Slint property
+                                    ui.set_rpm(current_rpm as f32);
+                                }
+                            });
+                        }
+                        Err(e) => {
+                            eprintln!("Error reading from port: {}", e);
+                        }
+                    }
+
+                    // Throttle the OBD requests to avoid flooding the bus
+                    thread::sleep(Duration::from_millis(100));
+                }
+            }
+            Err(e) => {
+                eprintln!("Failed to open port: {}", e);
             }
         }
-        Err(e) => {
-            eprintln!("Failed to open port: {}", e);
-        }
-    }
+    });
+
+    // Start the event loop on the main thread (blocks here until the window closes)
+    app.run()
 }

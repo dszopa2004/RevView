@@ -4,6 +4,9 @@ export component Dashboard inherits Window {
     width: 480px;
     height: 320px;
     background: #171a20;
+    // Expose properties that can be set dynamically in code
+    in-out property <float> rpm: 0.0;
+    in-out property <float> speed: 0.0;
 
     VerticalLayout {
         alignment: center;
