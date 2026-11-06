@@ -30,7 +30,10 @@ fn warm_up_protocol(port: &mut Box<dyn SerialPort>) -> io::Result<()> {
     if !compact.contains("4100") {
         return Err(io::Error::new(
             io::ErrorKind::NotConnected,
-            format!("Car did not respond (is the ignition on?): {}", response.trim()),
+            format!(
+                "Car did not respond (is the ignition on?): {}",
+                response.trim()
+            ),
         ));
     }
 
@@ -61,7 +64,11 @@ pub fn initialize_adapter(port: &mut Box<dyn SerialPort>) -> io::Result<()> {
         if command != "ATZ\r" && !response.contains("OK") {
             return Err(io::Error::new(
                 io::ErrorKind::InvalidData,
-                format!("Unexpected response to {}: {}", command.trim(), response.trim()),
+                format!(
+                    "Unexpected response to {}: {}",
+                    command.trim(),
+                    response.trim()
+                ),
             ));
         }
     }
@@ -74,7 +81,7 @@ pub fn initialize_adapter(port: &mut Box<dyn SerialPort>) -> io::Result<()> {
 pub fn open_connection() -> Result<Box<dyn SerialPort>> {
     // Open the port
     let port = serialport::new(PORT_NAME, BAUD_RATE)
-        .timeout(Duration::from_millis(500))
+        .timeout(Duration::from_millis(NORMAL_TIMEOUT.as_millis() as u64))
         .open()?;
 
     Ok(port)
