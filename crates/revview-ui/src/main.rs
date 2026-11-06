@@ -23,6 +23,12 @@ fn main() -> Result<(), slint::PlatformError> {
 
         match open_connection() {
             Ok(mut port) => {
+                let app_copy = app_weak.clone();
+                let _ = slint::invoke_from_event_loop(move || {
+                    if let Some(ui) = app_copy.upgrade() {
+                        ui.set_obd_connected(true); // Set if OBD-II is connected successfully
+                    }
+                });
                 println!("Successfully opened the port!");
 
                 if let Err(e) = initialize_adapter(&mut port) {
@@ -67,6 +73,13 @@ fn main() -> Result<(), slint::PlatformError> {
                 }
             }
             Err(e) => {
+                let app_copy = app_weak.clone();
+
+                let _ = slint::invoke_from_event_loop(move || {
+                    if let Some(ui) = app_copy.upgrade() {
+                        ui.set_obd_connected(false); // Set if OBD-II is connected successfully
+                    }
+                });
                 eprintln!("Failed to open port: {}", e);
             }
         }
