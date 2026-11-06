@@ -1,5 +1,6 @@
 // Defines the visual layout, widgets, colors, and presentation of the dashboard.
 
+import { HorizontalBox, VerticalBox } from "std-widgets.slint";
 export component Dashboard inherits Window {
     width: 480px;
     height: 320px;
@@ -12,18 +13,54 @@ export component Dashboard inherits Window {
         alignment: center;
         spacing: 12px;
 
-        Text {
-            text: "RevView";
-            color: #ffffff;
-            font-size: 24px;
-            font-weight: 700;
+        // Top Header Bar
+        HorizontalBox {
+            padding: 0;
+            Text {
+                text: "RevView";
+                font-size: 20px;
+                font-weight: 800;
+                color: #00ffcc;
+            }
+
+            Text {
+                text: "OBD-II CONNECTED";
+                font-size: 14px;
+                color: #4ade80;
+                horizontal-alignment: right;
+                vertical-alignment: center;
+            }
         }
 
-        Text {
-            text: "2000 RPM";
-            color: #00d4ff;
-            font-size: 48px;
-            font-weight: 700;
+        VerticalBox {
+            alignment: center;
+            Text {
+                text: "ENGINE RPM";
+                font-size: 14px;
+                color: #94a3b8;
+                horizontal-alignment: center;
+            }
+
+            Text {
+                text: "\{round(root.rpm)}";
+                font-size: 54px;
+                font-weight: 900;
+                color: root.rpm > 6000.0 ? #ef4444 : #ffffff; // Change to red when approaching redline
+                horizontal-alignment: center;
+            }
+
+            // Simple progress bar mock up
+                    Rectangle {
+                height: 8px;
+                background: #2e3748;
+                border-radius: 4px;
+                Rectangle {
+                    x: 0;
+                    width: parent.width * (root.rpm / 8000.0); // Assuming 8k max RPM
+                            background: root.rpm > 6000.0 ? #ef4444 : #00ffcc;
+                    border-radius: 4px;
+                }
+            }
         }
 
         Text {
