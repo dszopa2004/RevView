@@ -2,8 +2,8 @@
 
 import { HorizontalBox, VerticalBox } from "std-widgets.slint";
 export component Dashboard inherits Window {
-    width: 780px;
-    height: 620px;
+    width: 680px;
+    height: 520px;
     background: #171a20;
 
     // Expose properties that can be set dynamically in code
@@ -14,7 +14,7 @@ export component Dashboard inherits Window {
     in-out property <float> speed: 0.0;
 
     // --- Telemetry Dashboard ---
-if  !root.obd-initialized: Rectangle {
+if  root.obd-initialized: Rectangle {
         x: 12px;
         y: 12px;
         width: parent.width - 24px;
@@ -113,7 +113,7 @@ if  !root.obd-initialized: Rectangle {
     
     // Error Menu
     // --- Error Menu ---
-if  root.obd-initialized: Rectangle {
+if  !root.obd-initialized: Rectangle {
         x: 12px;
         y: 12px;
         width: parent.width - 24px;
