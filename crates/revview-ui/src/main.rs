@@ -3,7 +3,7 @@
 use revview_core::VehicleTelemetry;
 use revview_obd::{
     commands,
-    connection::{open_connection, read_response, send_command},
+    connection::{open_connection, initialize_adapter, read_response, send_command},
     parser,
 };
 
@@ -19,6 +19,13 @@ fn main() {
     match open_connection() {
         Ok(mut port) => {
             println!("Successfully opened the port!");
+
+            if let Err(e) = initialize_adapter(&mut port) {
+                eprintln!("Failed to initialize adapter: {}", e);
+                return;
+            }
+    
+            println!("Adapter initialized successfully!");
 
             // Handle the write result
             if let Err(e) = send_command(&mut port, commands::RPM_COMMAND) {
