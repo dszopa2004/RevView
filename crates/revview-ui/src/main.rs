@@ -32,9 +32,22 @@ fn main() -> Result<(), slint::PlatformError> {
                 println!("Successfully opened the port!");
 
                 if let Err(e) = initialize_adapter(&mut port) {
+                    let app_copy = app_weak.clone();
+                    let _ = slint::invoke_from_event_loop(move || {
+                        if let Some(ui) = app_copy.upgrade() {
+                            ui.set_obd_initialized(false); // Set if OBD-II is not initialized successfully
+                        }
+                    });
                     eprintln!("Failed to initialize adapter: {}", e);
                     return;
                 }
+
+                let app_copy = app_weak.clone();
+                let _ = slint::invoke_from_event_loop(move || {
+                    if let Some(ui) = app_copy.upgrade() {
+                        ui.set_obd_initialized(true); // Set if OBD-II is initialized successfully
+                    }
+                });
 
                 println!("Adapter initialized successfully!");
 

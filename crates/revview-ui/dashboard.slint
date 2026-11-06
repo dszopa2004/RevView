@@ -8,10 +8,12 @@ export component Dashboard inherits Window {
 
     // Expose properties that can be set dynamically in code
     in-out property <bool> obd-connected: false;
+    in-out property <bool> obd-initialized: false;
     in-out property <float> rpm: 0.0;
     in-out property <float> speed: 0.0;
 
-    VerticalLayout {
+    // --- Telemetry Dashboard
+    if root.obd-initialized: VerticalLayout {
         alignment: center;
         spacing: 12px;
 
@@ -23,14 +25,6 @@ export component Dashboard inherits Window {
                 font-size: 20px;
                 font-weight: 800;
                 color: #00ffcc;
-            }
-
-            Text {
-                text: root.obd-connected ? "OBD-II Connected" : "Disconnected";
-                font-size: 14px;
-                color: #4ade80;
-                horizontal-alignment: right;
-                vertical-alignment: center;
             }
         }
 
@@ -44,7 +38,7 @@ export component Dashboard inherits Window {
 
                 Text {
                     text: "\{round(root.speed)}";
-                    font-size: 48px;
+                    font-size: 72px;
                     font-weight: 900;
                     color: #ffffff;
                     vertical-alignment: bottom;
@@ -52,7 +46,7 @@ export component Dashboard inherits Window {
 
                 Text {
                     text: "Kph";
-                    font-size: 16px;
+                    font-size: 32px;
                     font-weight: 900;
                     color: #ffffff;
                     vertical-alignment: center;
@@ -98,5 +92,35 @@ export component Dashboard inherits Window {
                 }
             }
         } // --- RPM Container ---
+    }
+    // --- Telemetry Dashboard
+    
+
+    VerticalBox {
+        VerticalBox {
+            Text {
+                text: "Could not start dashboard!";
+                font-size: 32px;
+                color: #4ade80;
+                horizontal-alignment: center;
+                vertical-alignment: center;
+            }
+
+            Text {
+                text: root.obd-connected ? "OBD-II Connected" : "OBD-II Disconnected";
+                font-size: 14px;
+                color: #4ade80;
+                horizontal-alignment: center;
+                vertical-alignment: center;
+            }
+
+            Text {
+                text: root.obd-initialized ? "OBD-II Initialized" : "OBD-II Uninitialized";
+                font-size: 14px;
+                color: #4ade80;
+                horizontal-alignment: center;
+                vertical-alignment: center;
+            }
+        }
     }
 }
