@@ -32,26 +32,39 @@ export component Dashboard inherits Window {
             }
         }
 
+        // --- Speed Container ---
         VerticalBox {
             alignment: center;
-            Text {
-                text: "ENGINE RPM";
-                font-size: 14px;
-                color: #94a3b8;
-                horizontal-alignment: center;
-            }
 
-            Text {
-                text: "\{round(root.rpm)}";
-                font-size: 54px;
-                font-weight: 900;
-                color: root.rpm > 6000.0 ? #ef4444 : #ffffff; // Change to red when approaching redline
-                horizontal-alignment: center;
-            }
+            HorizontalLayout {
+                alignment: center;
+                spacing: 8px; // Space between the texts
 
-            // Simple progress bar mock up
-                    Rectangle {
-                height: 8px;
+                Text {
+                    text: "\{round(root.speed)}";
+                    font-size: 48px;
+                    font-weight: 900;
+                    color: #ffffff;
+                    vertical-alignment: bottom;
+                }
+
+                Text {
+                    text: "Kph";
+                    font-size: 16px;
+                    font-weight: 900;
+                    color: #ffffff;
+                    vertical-alignment: center;
+                }
+            }
+        } // --- Speed Container ---
+
+        // --- RPM Container ---
+        VerticalBox {
+            alignment: center;
+
+            // Simple progress bar
+            Rectangle {
+                height: 32px; // Thickness of progress bar
                 background: #2e3748;
                 border-radius: 4px;
                 Rectangle {
@@ -61,18 +74,27 @@ export component Dashboard inherits Window {
                     border-radius: 4px;
                 }
             }
-        }
 
-        Text {
-            text: "Speed: 45 km/h";
-            color: #ffffff;
-            font-size: 20px;
-        }
+            HorizontalLayout {
+                alignment: center;
+                spacing: 8px; // Space between the texts
 
-        Text {
-            text: "Coolant: 88 °C";
-            color: #ffffff;
-            font-size: 20px;
-        }
+                Text {
+                    text: "\{round(root.rpm)}";
+                    font-size: 48px;
+                    font-weight: 900;
+                    color: root.rpm > 6000.0 ? #ef4444 : #ffffff; // Change to red when approaching redline
+                    vertical-alignment: bottom;
+                }
+
+                Text {
+                    text: "RPM";
+                    font-size: 16px;
+                    font-weight: 900;
+                    color: root.rpm > 6000.0 ? #ef4444 : #ffffff; // Change to red when approaching redline
+                    vertical-alignment: center;
+                }
+            }
+        } // --- RPM Container ---
     }
 }
