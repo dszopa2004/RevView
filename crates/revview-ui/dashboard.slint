@@ -98,24 +98,26 @@ export component Dashboard inherits Window {
     
     // Error Menu
     if !root.obd-initialized: VerticalLayout {
+        alignment: center;
+
         VerticalBox {
-            spacing: -24px;
+            spacing: 24px;
+
             Text {
                 text: "Could not start dashboard!";
                 font-size: 36px;
                 color: #4ade80;
                 horizontal-alignment: center;
-                vertical-alignment: center;
             }
 
             VerticalBox {
-                spacing: -12px;
+                spacing: 6px;
+
                 Text {
                     text: root.obd-connected ? "OBD-II Connected" : "OBD-II Disconnected";
                     font-size: 28px;
                     color: #4ade80;
                     horizontal-alignment: center;
-                    vertical-alignment: center;
                 }
 
                 Text {
@@ -123,18 +125,17 @@ export component Dashboard inherits Window {
                     font-size: 12px;
                     color: #4ade80;
                     horizontal-alignment: center;
-                    vertical-alignment: center;
                 }
             }
 
             VerticalBox {
-                spacing: -12px;
+                spacing: 6px;
+
                 Text {
                     text: root.obd-initialized ? "OBD-II Initialized" : "OBD-II Uninitialized";
                     font-size: 28px;
                     color: #4ade80;
                     horizontal-alignment: center;
-                    vertical-alignment: center;
                 }
 
                 Text {
@@ -142,7 +143,6 @@ export component Dashboard inherits Window {
                     font-size: 12px;
                     color: #4ade80;
                     horizontal-alignment: center;
-                    vertical-alignment: center;
                 }
             }
         }
