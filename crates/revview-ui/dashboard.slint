@@ -14,7 +14,7 @@ export component Dashboard inherits Window {
     in-out property <float> speed: 0.0;
 
     // --- Telemetry Dashboard ---
-if !root.obd-initialized: Rectangle {
+if  root.obd-initialized: Rectangle {
         x: 12px;
         y: 12px;
         width: parent.width - 24px;
@@ -112,52 +112,67 @@ if !root.obd-initialized: Rectangle {
     // --- Telemetry Dashboard
     
     // Error Menu
-    if root.obd-initialized: VerticalLayout {
-        alignment: center;
+    // --- Error Menu ---
+if  !root.obd-initialized: Rectangle {
+        x: 12px;
+        y: 12px;
+        width: parent.width - 24px;
+        height: parent.height - 24px;
 
-        VerticalBox {
+        // Panel styling
+        background: #202630;
+        border-color: #354152;
+        border-width: 1px;
+        border-radius: 16px;
+
+        VerticalLayout {
+            alignment: center;
             spacing: 24px;
 
-            Text {
-                text: "Could not start dashboard!";
-                font-size: 36px;
-                color: #4ade80;
-                horizontal-alignment: center;
-            }
-
             VerticalBox {
-                spacing: 6px;
+                spacing: 24px;
 
                 Text {
-                    text: root.obd-connected ? "OBD-II Connected" : "OBD-II Disconnected";
-                    font-size: 28px;
+                    text: "Could not start dashboard!";
+                    font-size: 36px;
                     color: #4ade80;
                     horizontal-alignment: center;
                 }
 
-                Text {
-                    text: root.obd-connected ? "" : "Make sure your OBD-II adapter is plugged in.";
-                    font-size: 12px;
-                    color: #4ade80;
-                    horizontal-alignment: center;
+                VerticalBox {
+                    spacing: 6px;
+
+                    Text {
+                        text: root.obd-connected ? "OBD-II Connected" : "OBD-II Disconnected";
+                        font-size: 28px;
+                        color: #4ade80;
+                        horizontal-alignment: center;
+                    }
+
+                    Text {
+                        text: root.obd-connected ? "" : "Make sure your OBD-II adapter is plugged in.";
+                        font-size: 12px;
+                        color: #4ade80;
+                        horizontal-alignment: center;
+                    }
                 }
-            }
 
-            VerticalBox {
-                spacing: 6px;
+                VerticalBox {
+                    spacing: 6px;
 
-                Text {
-                    text: root.obd-initialized ? "OBD-II Initialized" : "OBD-II Uninitialized";
-                    font-size: 28px;
-                    color: #4ade80;
-                    horizontal-alignment: center;
-                }
+                    Text {
+                        text: root.obd-initialized ? "OBD-II Initialized" : "OBD-II Uninitialized";
+                        font-size: 28px;
+                        color: #4ade80;
+                        horizontal-alignment: center;
+                    }
 
-                Text {
-                    text: obd-initialization-error;
-                    font-size: 12px;
-                    color: #4ade80;
-                    horizontal-alignment: center;
+                    Text {
+                        text: obd-initialization-error;
+                        font-size: 12px;
+                        color: #4ade80;
+                        horizontal-alignment: center;
+                    }
                 }
             }
         }
