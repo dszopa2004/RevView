@@ -1,6 +1,9 @@
 // Defines the visual layout, widgets, colors, and presentation of the dashboard.
 
-import { HorizontalBox, VerticalBox } from "std-widgets.slint";
+import { HorizontalBox, VerticalBox, Button } from "std-widgets.slint";
+import { Telemetry } from "telemetry.slint";
+import { Speedometer } from "speedometer.slint";
+
 export component Dashboard inherits Window {
     width: 480px;
     height: 320px;
@@ -12,6 +15,7 @@ export component Dashboard inherits Window {
     in-out property <string> obd-initialization-error: "";
     in-out property <float> rpm: 0.0;
     in-out property <float> speed: 0.0;
+    in-out property <int> current-view: 0;
 
     // --- Telemetry Dashboard ---
 if  !root.obd-initialized: Rectangle {
@@ -29,6 +33,12 @@ if  !root.obd-initialized: Rectangle {
         VerticalLayout {
             alignment: center;
             spacing: 12px;
+
+            HorizontalLayout {
+                spacing: 10px;
+                Button { text: "Speedometer"; clicked => { root.current-view = 0; } }
+                Button { text: "Telemetry"; clicked => { root.current-view = 1; } }
+            }
 
             // --- Speed Container ---
             VerticalBox {
