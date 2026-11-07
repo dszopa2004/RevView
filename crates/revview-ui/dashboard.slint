@@ -40,70 +40,14 @@ if  !root.obd-initialized: Rectangle {
                 Button { text: "Telemetry"; clicked => { root.current-view = 1; } }
             }
 
-            // --- Speed Container ---
-            VerticalBox {
-                alignment: center;
-
-                HorizontalLayout {
-                    alignment: center;
-                    spacing: 8px;
-
-                    Text {
-                        text: "\{round(root.speed)}";
-                        font-size: 84px;
-                        font-weight: 900;
-                        color: #ffffff;
-                        vertical-alignment: bottom;
-                    }
-
-                    Text {
-                        text: "Kph";
-                        font-size: 32px;
-                        font-weight: 900;
-                        color: #ffffff;
-                        vertical-alignment: center;
-                    }
-                }
+            if root.current-view == 0: Speedometer{
+                obd-connected: root.obd-connected;
+                rpm: root.rpm;
+                speed: root.speed;
             }
+            if root.current-view == 1: Telemetry{}
 
-            // --- RPM Container ---
-            VerticalBox {
-                alignment: center;
-
-                Rectangle {
-                    height: 32px;
-                    background: #2e3748;
-                    border-radius: 4px;
-
-                    Rectangle {
-                        x: 0;
-                        width: parent.width * (root.rpm / 8000.0);
-                        background: root.rpm > 6000.0 ? #ef4444 : #00ffcc;
-                        border-radius: 4px;
-                    }
-                }
-
-                HorizontalLayout {
-                    alignment: center;
-                    spacing: 8px;
-
-                    Text {
-                        text: "\{round(root.rpm)}";
-                        font-size: 48px;
-                        font-weight: 900;
-                        color: root.rpm > 6000.0 ? #ef4444 : #ffffff;
-                        vertical-alignment: bottom;
-                    }
-
-                    Text {
-                        text: "RPM";
-                        font-size: 16px;
-                        font-weight: 900;
-                        color: root.rpm > 6000.0 ? #ef4444 : #ffffff;
-                        vertical-alignment: center;
-                    }
-                }
-            }
+            
         }
 
         // --- Footer ---
