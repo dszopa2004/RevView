@@ -1,79 +1,123 @@
-// Defines the visual layout, widgets, colors, and presentation of the dashboard.
 
 import { HorizontalBox, VerticalBox, Button } from "std-widgets.slint";
 import { Telemetry } from "telemetry.slint";
 import { Speedometer } from "speedometer.slint";
 
 export component Dashboard inherits Window {
-    width: 480px;
-    height: 320px;
+    preferred-width: 480px;
+    preferred-height: 320px;
+
+    min-width: 480px;
+    min-height: 320px;
+
+    maximized: true;
     background: #171a20;
 
-    // Expose properties that can be set dynamically in code
+    // OBD-II Properties
     in-out property <bool> obd-connected: false;
     in-out property <bool> obd-initialized: false;
     in-out property <string> obd-initialization-error: "";
     in-out property <float> rpm: 0.0;
     in-out property <float> speed: 0.0;
-    in-out property <int> current-view: 0;
+    in-out property <int> current-view: 1;
 
-    // --- Telemetry Dashboard ---
-if  root.obd-initialized: Rectangle {
+    // --- Main Dashboard ---
+    if !root.obd-initialized: Rectangle {
         x: 12px;
         y: 12px;
         width: parent.width - 24px;
-        height: parent.height - 24px;
+        height: parent.height - 36px;
 
         background: #202630;
         border-color: #354152;
         border-width: 1px;
         border-radius: 16px;
 
-        // --- Main Telemetry Layout ---
-        VerticalLayout {
-            alignment: center;
-            spacing: 12px;
+        HorizontalLayout {
+            padding: 12px;
+            spacing: 6px;
 
-            HorizontalLayout {
-                spacing: 10px;
-                Button { text: "Speedometer"; clicked => { root.current-view = 0; } }
-                Button { text: "Telemetry"; clicked => { root.current-view = 1; } }
+            // --- Left Navigation ---
+            Rectangle {
+                horizontal-stretch: 0.35;
+                min-width: 28px;
+                background: left-touch.pressed ? #45475a : #2a2b36;
+                border-radius: 8px;
+
+                Text {
+                    text: "<";
+                    font-size: 24px;
+                    color: white;
+                    horizontal-alignment: center;
+                    vertical-alignment: center;
+                }
+
+                left-touch := TouchArea {
+                    clicked => {
+                        root.current-view = 0;
+                    }
+                }
             }
 
-            if root.current-view == 0: Speedometer{
-                obd-connected: root.obd-connected;
-                rpm: root.rpm;
-                speed: root.speed;
+            // --- Center Dashboard ---
+            Rectangle {
+                horizontal-stretch: 9.3;
+                background: #1e1e2e;
+                border-radius: 10px;
+
+                if root.current-view == 0: Speedometer {
+                    obd-connected: root.obd-connected;
+                    rpm: root.rpm;
+                    speed: root.speed;
+                }
+
+                if root.current-view == 1: Telemetry { }
             }
-            if root.current-view == 1: Telemetry{}
 
-            
-        }
+            // --- Right Navigation ---
+            Rectangle {
+                horizontal-stretch: 0.35;
+                min-width: 28px;
+                background: right-touch.pressed ? #45475a : #2a2b36;
+                border-radius: 8px;
 
-        // --- Footer ---
-        Text {
-            text: "--- RevView ---";
-            font-size: 12px;
-            font-weight: 800;
-            color: #00ffcc;
-            horizontal-alignment: center;
+                Text {
+                    text: ">";
+                    font-size: 24px;
+                    color: white;
+                    horizontal-alignment: center;
+                    vertical-alignment: center;
+                }
 
-            x: 0px;
-            width: parent.width;
-            y: parent.height - self.height - 6px;
+                right-touch := TouchArea {
+                    clicked => {
+                        root.current-view = 1;
+                    }
+                }
+            }
         }
     }
-    // --- Telemetry Dashboard
-    
-    // Error Menu
+
+    // --- Footer ---
+    Text {
+        text: "--- RevView ---";
+        font-size: 12px;
+        font-weight: 800;
+        color: #00ffcc;
+        horizontal-alignment: center;
+
+        x: 0px;
+        width: parent.width;
+        y: parent.height - self.height - 4px;
+    }
+
     // --- Error Menu ---
-if  !root.obd-initialized: Rectangle {
+    if root.obd-initialized: Rectangle {
         x: 12px;
         y: 12px;
         width: parent.width - 24px;
-        height: parent.height - 24px;
+        height: parent.height - 36px;
 
-        // Panel styling
         background: #202630;
         border-color: #354152;
         border-width: 1px;
@@ -97,14 +141,18 @@ if  !root.obd-initialized: Rectangle {
                     spacing: 6px;
 
                     Text {
-                        text: root.obd-connected ? "OBD-II Connected" : "OBD-II Disconnected";
+                        text: root.obd-connected
+                            ? "OBD-II Connected"
+                            : "OBD-II Disconnected";
                         font-size: 28px;
                         color: #4ade80;
                         horizontal-alignment: center;
                     }
 
                     Text {
-                        text: root.obd-connected ? "" : "Make sure your OBD-II adapter is plugged in.";
+                        text: root.obd-connected
+                            ? ""
+                            : "Make sure your OBD-II adapter is plugged in.";
                         font-size: 12px;
                         color: #4ade80;
                         horizontal-alignment: center;
@@ -115,14 +163,16 @@ if  !root.obd-initialized: Rectangle {
                     spacing: 6px;
 
                     Text {
-                        text: root.obd-initialized ? "OBD-II Initialized" : "OBD-II Uninitialized";
+                        text: root.obd-initialized
+                            ? "OBD-II Initialized"
+                            : "OBD-II Uninitialized";
                         font-size: 28px;
                         color: #4ade80;
                         horizontal-alignment: center;
                     }
 
                     Text {
-                        text: obd-initialization-error;
+                        text: root.obd-initialization-error;
                         font-size: 12px;
                         color: #4ade80;
                         horizontal-alignment: center;
