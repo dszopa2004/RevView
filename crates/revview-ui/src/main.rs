@@ -83,17 +83,26 @@ fn main() -> Result<(), slint::PlatformError> {
                     }
 
                     // Throttle Position
+                    match request_telemetry(&mut *port, commands::THROTTLE_POSITION_COMMAND) {
+                        Ok(response) => {
+                            telemetry.throttle_position =
+                                parser::parse_throttle_position_response(&response);
+                        }
+                        Err(e) => eprintln!("Throttle position request failed: {}", e),
+                    }
 
                     let rpm = telemetry.rpm.unwrap_or(0) as f32;
                     let speed = telemetry.speed_kph.unwrap_or(0) as f32;
                     let coolant_temp = telemetry.coolant_temp_c.unwrap_or(0) as f32;
                     let intake_temp = telemetry.intake_temp_c.unwrap_or(0) as f32;
+                    let throttle_position = telemetry.throttle_position.unwrap_or(0.0) as f32;
 
                     update_ui(&app_weak, move |ui| {
                         ui.set_rpm(rpm);
                         ui.set_speed(speed);
                         ui.set_coolant_temp(coolant_temp);
                         ui.set_intake_temp(intake_temp);
+                        ui.set_throttle_position(throttle_position);
                     });
 
                     thread::sleep(Duration::from_millis(100));

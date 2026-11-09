@@ -5,6 +5,7 @@ pub const RPM_COMMAND: &str = "010C\r";
 pub const SPEED_COMMAND: &str = "010D\r";
 pub const COOLANT_TEMP_COMMAND: &str = "0105\r";
 pub const INTAKE_TEMP_COMMAND: &str = "010F\r";
+pub const THROTTLE_POSITION_COMMAND: &str = "0111\r";
 
 // Adapter commands
 pub const RESET_ADAPTER_COMMAND: &str = "ATZ\r";
