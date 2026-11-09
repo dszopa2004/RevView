@@ -20,6 +20,9 @@ export component Dashboard inherits Window {
     in-out property <float> rpm: 0.0;
     in-out property <float> speed: 0.0;
     in-out property <int> current-view: 1;
+    in-out property <float> coolant-temp: 0.0;
+    in-out property <float> intake-temp: 0.0;
+    in-out property <float> throttle-position: 0.0;
 
     // --- Main Dashboard ---
     if !root.obd-initialized: Rectangle {
@@ -71,7 +74,13 @@ export component Dashboard inherits Window {
                     speed: root.speed;
                 }
 
-                if root.current-view == 1: Telemetry { }
+                if root.current-view == 1: Telemetry {
+                    coolant-temp: root.coolant-temp;
+                    intake-temp: root.intake-temp;
+                    throttle-position: root.throttle-position;
+                    speed: root.speed;
+                    rpm: root.rpm;
+                }
             }
 
             // --- Right Navigation ---
