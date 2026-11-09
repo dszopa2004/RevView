@@ -28,7 +28,7 @@ export component Dashboard inherits Window {
     out property <int> min-view: 0;
 
     // --- Main Dashboard ---
-    if !root.obd-initialized: Rectangle {
+    if root.obd-initialized: Rectangle {
         x: 12px;
         y: 12px;
         width: parent.width - 24px;
@@ -130,7 +130,7 @@ export component Dashboard inherits Window {
     }
 
     // --- Error Menu ---
-    if root.obd-initialized: Rectangle {
+    if !root.obd-initialized: Rectangle {
         x: 12px;
         y: 12px;
         width: parent.width - 24px;
@@ -149,7 +149,7 @@ export component Dashboard inherits Window {
                 spacing: 24px;
 
                 Text {
-                    text: "Could not start dashboard!";
+                    text: "RevView Dashboard";
                     font-size: 36px;
                     color: #4ade80;
                     horizontal-alignment: center;
