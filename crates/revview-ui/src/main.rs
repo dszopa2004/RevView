@@ -65,12 +65,35 @@ fn main() -> Result<(), slint::PlatformError> {
                         Err(e) => eprintln!("Speed request failed: {}", e),
                     }
 
+                    // Coolant Temp
+                    match request_telemetry(&mut *port, commands::COOLANT_TEMP_COMMAND) {
+                        Ok(response) => {
+                            telemetry.coolant_temp_c =
+                                parser::parse_coolant_temp_response(&response);
+                        }
+                        Err(e) => eprintln!("Coolant temp request failed: {}", e),
+                    }
+
+                    // Intake Temp
+                    match request_telemetry(&mut *port, commands::INTAKE_TEMP_COMMAND) {
+                        Ok(response) => {
+                            telemetry.intake_temp_c = parser::parse_intake_temp_response(&response);
+                        }
+                        Err(e) => eprintln!("Intake temp request failed: {}", e),
+                    }
+
+                    // Throttle Position
+
                     let rpm = telemetry.rpm.unwrap_or(0) as f32;
                     let speed = telemetry.speed_kph.unwrap_or(0) as f32;
+                    let coolant_temp = telemetry.coolant_temp_c.unwrap_or(0) as f32;
+                    let intake_temp = telemetry.intake_temp_c.unwrap_or(0) as f32;
 
                     update_ui(&app_weak, move |ui| {
                         ui.set_rpm(rpm);
                         ui.set_speed(speed);
+                        ui.set_coolant_temp(coolant_temp);
+                        ui.set_intake_temp(intake_temp);
                     });
 
                     thread::sleep(Duration::from_millis(100));
