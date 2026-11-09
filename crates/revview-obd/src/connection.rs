@@ -88,7 +88,7 @@ pub fn open_connection() -> Result<Box<dyn SerialPort>> {
 }
 
 // Sends a command to the open connection
-pub fn send_command(port: &mut impl Write, command: &str) -> io::Result<()> {
+pub fn send_command<T: Write + ?Sized>(port: &mut T, command: &str) -> io::Result<()> {
     port.write_all(command.as_bytes())?;
     port.flush()?;
 
@@ -97,7 +97,7 @@ pub fn send_command(port: &mut impl Write, command: &str) -> io::Result<()> {
 
 // Reads the adapter's response
 // Reads the adapter's response until the '>' prompt is found
-pub fn read_response(port: &mut impl Read) -> io::Result<String> {
+pub fn read_response<T: Read + ?Sized>(port: &mut T) -> io::Result<String> {
     let mut full_buffer = Vec::new();
     let mut single_byte = [0u8; 1]; // Read 1 byte at a time to check for the delimiter
 
