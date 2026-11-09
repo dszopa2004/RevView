@@ -9,7 +9,7 @@ const NORMAL_TIMEOUT: Duration = Duration::from_millis(500);
 const WARMUP_TIMEOUT: Duration = Duration::from_secs(10);
 
 static PORT_NAME: &str = "/dev/ttyUSB0";
-static BAUD_RATE: u32 = 9600; // Try 38400 if ATZ returns nothing readable
+static BAUD_RATE: u32 = 38400; // Try 38400 if ATZ returns nothing readable
 
 // Forces the adapter to finish protocol detection before real polling starts
 fn warm_up_protocol(port: &mut Box<dyn SerialPort>) -> io::Result<()> {
@@ -81,7 +81,7 @@ pub fn initialize_adapter(port: &mut Box<dyn SerialPort>) -> io::Result<()> {
 pub fn open_connection() -> Result<Box<dyn SerialPort>> {
     // Open the port
     let port = serialport::new(PORT_NAME, BAUD_RATE)
-        .timeout(Duration::from_millis(NORMAL_TIMEOUT.as_millis() as u64))
+        .timeout(Duration::from_millis(WARMUP_TIMEOUT.as_millis() as u64))
         .open()?;
 
     Ok(port)

@@ -18,7 +18,7 @@ export component Dashboard inherits Window {
     in-out property <int> current-view: 0;
 
     // --- Telemetry Dashboard ---
-if  !root.obd-initialized: Rectangle {
+if  root.obd-initialized: Rectangle {
         x: 12px;
         y: 12px;
         width: parent.width - 24px;
@@ -67,7 +67,7 @@ if  !root.obd-initialized: Rectangle {
     
     // Error Menu
     // --- Error Menu ---
-if  root.obd-initialized: Rectangle {
+if  !root.obd-initialized: Rectangle {
         x: 12px;
         y: 12px;
         width: parent.width - 24px;
