@@ -49,31 +49,30 @@ fn main() -> Result<(), slint::PlatformError> {
 
                 // Infinite loop to continuously update telemetry while the app runs
                 loop {
-                    if let Err(e) = send_command(&mut port, commands::RPM_COMMAND) {
-                        eprintln!("Failed to send command: {}", e);
-                        thread::sleep(Duration::from_millis(500));
-                        continue;
-                    }
-
-                    match read_response(&mut port) {
+                    // RPM
+                    match request_telemetry(&mut *port, commands::RPM_COMMAND) {
                         Ok(response) => {
-                            println!("Success! Received bytes: {:?}", response);
                             telemetry.rpm = parser::parse_rpm_response(&response);
-                            println!("RPMs: {:?}", telemetry.rpm);
-
-                            // Clone weak handle and upgrade it on the UI thread to push updates
-                            let current_rpm = telemetry.rpm.unwrap_or(0) as f32;
-
-                            update_ui(&app_weak, move |ui| {
-                                ui.set_rpm(current_rpm); // Set RPM property
-                            });
                         }
-                        Err(e) => {
-                            eprintln!("Error reading from port: {}", e);
-                        }
+                        Err(e) => eprintln!("RPM request failed: {}", e),
                     }
 
-                    // Throttle the OBD requests to avoid flooding the bus
+                    // Speed
+                    match request_telemetry(&mut *port, commands::SPEED_COMMAND) {
+                        Ok(response) => {
+                            telemetry.speed_kph = parser::parse_speed_response(&response);
+                        }
+                        Err(e) => eprintln!("Speed request failed: {}", e),
+                    }
+
+                    let rpm = telemetry.rpm.unwrap_or(0) as f32;
+                    let speed = telemetry.speed_kph.unwrap_or(0) as f32;
+
+                    update_ui(&app_weak, move |ui| {
+                        ui.set_rpm(rpm);
+                        ui.set_speed(speed);
+                    });
+
                     thread::sleep(Duration::from_millis(100));
                 }
             }
@@ -98,4 +97,14 @@ fn update_ui(app_weak: &slint::Weak<Dashboard>, update: impl FnOnce(Dashboard) +
             update(ui);
         }
     });
+}
+
+fn request_telemetry(
+    port: &mut dyn serialport::SerialPort,
+    command: &str,
+) -> Result<String, Box<dyn std::error::Error>> {
+    send_command(port, command)?;
+    let response = read_response(port)?;
+
+    Ok(response)
 }
