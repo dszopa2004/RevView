@@ -19,10 +19,13 @@ export component Dashboard inherits Window {
     in-out property <string> obd-initialization-error: "";
     in-out property <float> rpm: 0.0;
     in-out property <float> speed: 0.0;
-    in-out property <int> current-view: 1;
+    in-out property <int> current-view: 0;
     in-out property <float> coolant-temp: 0.0;
     in-out property <float> intake-temp: 0.0;
     in-out property <float> throttle-position: 0.0;
+
+    out property <int> max-view: 1;
+    out property <int> min-view: 0;
 
     // --- Main Dashboard ---
     if !root.obd-initialized: Rectangle {
@@ -57,7 +60,10 @@ export component Dashboard inherits Window {
 
                 left-touch := TouchArea {
                     clicked => {
-                        root.current-view = 0;
+                        root.current-view -= 1;
+                        if root.current-view < min-view {
+                            root.current-view = max-view;
+                        }
                     }
                 }
             }
@@ -100,7 +106,10 @@ export component Dashboard inherits Window {
 
                 right-touch := TouchArea {
                     clicked => {
-                        root.current-view = 1;
+                        root.current-view += 1;
+                        if root.current-view > max-view {
+                            root.current-view = min-view;
+                        }
                     }
                 }
             }
