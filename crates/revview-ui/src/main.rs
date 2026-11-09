@@ -9,7 +9,7 @@ use revview_core::VehicleTelemetry;
 use revview_obd::{
     connection::{initialize_adapter, open_connection, read_response, send_command},
     parser,
-    scheduler::{PollingScheduler, TelemetryKind},
+    scheduler::PollingScheduler,
 };
 
 slint::include_modules!();
