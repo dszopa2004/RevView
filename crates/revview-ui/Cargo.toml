@@ -8,6 +8,7 @@ build = "build.rs"
 [dependencies]
 revview-core = { path = "../revview-core" }
 revview-obd = { path = "../revview-obd" }
+serialport = "4.10.1"
 slint = "1"
 
 [build-dependencies]

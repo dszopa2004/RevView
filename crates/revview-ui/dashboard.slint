@@ -1,38 +1,202 @@
-// Defines the visual layout, widgets, colors, and presentation of the dashboard.
+
+import { HorizontalBox, VerticalBox, Button } from "std-widgets.slint";
+import { Telemetry } from "telemetry.slint";
+import { Speedometer } from "speedometer.slint";
 
 export component Dashboard inherits Window {
-    width: 480px;
-    height: 320px;
+    preferred-width: 480px;
+    preferred-height: 320px;
+
+    min-width: 480px;
+    min-height: 320px;
+
+    maximized: true;
     background: #171a20;
 
-    VerticalLayout {
-        alignment: center;
-        spacing: 12px;
+    // OBD-II Properties
+    in-out property <bool> obd-connected: false;
+    in-out property <bool> obd-initialized: false;
+    in-out property <string> obd-initialization-error: "";
+    in-out property <float> rpm: 0.0;
+    in-out property <float> speed: 0.0;
+    in-out property <int> current-view: 0;
+    in-out property <float> coolant-temp: 0.0;
+    in-out property <float> intake-temp: 0.0;
+    in-out property <float> throttle-position: 0.0;
 
-        Text {
-            text: "RevView";
-            color: #ffffff;
-            font-size: 24px;
-            font-weight: 700;
+    out property <int> max-view: 1;
+    out property <int> min-view: 0;
+
+    // --- Main Dashboard ---
+    if root.obd-initialized: Rectangle {
+        x: 12px;
+        y: 12px;
+        width: parent.width - 24px;
+        height: parent.height - 36px;
+
+        background: #202630;
+        border-color: #354152;
+        border-width: 1px;
+        border-radius: 16px;
+
+        HorizontalLayout {
+            padding: 12px;
+            spacing: 6px;
+
+            // --- Left Navigation ---
+            Rectangle {
+                horizontal-stretch: 0.35;
+                min-width: 28px;
+                background: left-touch.pressed ? #45475a : #2a2b36;
+                border-radius: 8px;
+
+                Text {
+                    text: "<";
+                    font-size: 24px;
+                    color: white;
+                    horizontal-alignment: center;
+                    vertical-alignment: center;
+                }
+
+                left-touch := TouchArea {
+                    clicked => {
+                        root.current-view -= 1;
+                        if root.current-view < min-view {
+                            root.current-view = max-view;
+                        }
+                    }
+                }
+            }
+
+            // --- Center Dashboard ---
+            Rectangle {
+                horizontal-stretch: 9.3;
+                background: #1e1e2e;
+                border-radius: 10px;
+
+                if root.current-view == 0: Speedometer {
+                    obd-connected: root.obd-connected;
+                    rpm: root.rpm;
+                    speed: root.speed;
+                }
+
+                if root.current-view == 1: Telemetry {
+                    coolant-temp: root.coolant-temp;
+                    intake-temp: root.intake-temp;
+                    throttle-position: root.throttle-position;
+                    speed: root.speed;
+                    rpm: root.rpm;
+                }
+            }
+
+            // --- Right Navigation ---
+            Rectangle {
+                horizontal-stretch: 0.35;
+                min-width: 28px;
+                background: right-touch.pressed ? #45475a : #2a2b36;
+                border-radius: 8px;
+
+                Text {
+                    text: ">";
+                    font-size: 24px;
+                    color: white;
+                    horizontal-alignment: center;
+                    vertical-alignment: center;
+                }
+
+                right-touch := TouchArea {
+                    clicked => {
+                        root.current-view += 1;
+                        if root.current-view > max-view {
+                            root.current-view = min-view;
+                        }
+                    }
+                }
+            }
         }
+    }
 
-        Text {
-            text: "2000 RPM";
-            color: #00d4ff;
-            font-size: 48px;
-            font-weight: 700;
-        }
+    // --- Footer ---
+    Text {
+        text: "--- RevView ---";
+        font-size: 12px;
+        font-weight: 800;
+        color: #00ffcc;
+        horizontal-alignment: center;
 
-        Text {
-            text: "Speed: 45 km/h";
-            color: #ffffff;
-            font-size: 20px;
-        }
+        x: 0px;
+        width: parent.width;
+        y: parent.height - self.height - 4px;
+    }
 
-        Text {
-            text: "Coolant: 88 °C";
-            color: #ffffff;
-            font-size: 20px;
+    // --- Error Menu ---
+    if !root.obd-initialized: Rectangle {
+        x: 12px;
+        y: 12px;
+        width: parent.width - 24px;
+        height: parent.height - 36px;
+
+        background: #202630;
+        border-color: #354152;
+        border-width: 1px;
+        border-radius: 16px;
+
+        VerticalLayout {
+            alignment: center;
+            spacing: 24px;
+
+            VerticalBox {
+                spacing: 24px;
+
+                Text {
+                    text: "RevView Dashboard";
+                    font-size: 36px;
+                    color: #4ade80;
+                    horizontal-alignment: center;
+                }
+
+                VerticalBox {
+                    spacing: 6px;
+
+                    Text {
+                        text: root.obd-connected
+                            ? "OBD-II Connected"
+                            : "OBD-II Disconnected";
+                        font-size: 28px;
+                        color: #4ade80;
+                        horizontal-alignment: center;
+                    }
+
+                    Text {
+                        text: root.obd-connected
+                            ? ""
+                            : "Make sure your OBD-II adapter is plugged in.";
+                        font-size: 12px;
+                        color: #4ade80;
+                        horizontal-alignment: center;
+                    }
+                }
+
+                VerticalBox {
+                    spacing: 6px;
+
+                    Text {
+                        text: root.obd-initialized
+                            ? "OBD-II Initialized"
+                            : "OBD-II Uninitialized";
+                        font-size: 28px;
+                        color: #4ade80;
+                        horizontal-alignment: center;
+                    }
+
+                    Text {
+                        text: root.obd-initialization-error;
+                        font-size: 12px;
+                        color: #4ade80;
+                        horizontal-alignment: center;
+                    }
+                }
+            }
         }
     }
 }

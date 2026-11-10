@@ -9,7 +9,7 @@ const NORMAL_TIMEOUT: Duration = Duration::from_millis(500);
 const WARMUP_TIMEOUT: Duration = Duration::from_secs(10);
 
 static PORT_NAME: &str = "/dev/ttyUSB0";
-static BAUD_RATE: u32 = 9600; // Try 38400 if ATZ returns nothing readable
+static BAUD_RATE: u32 = 38400; // Try 38400 if ATZ returns nothing readable
 
 // Forces the adapter to finish protocol detection before real polling starts
 fn warm_up_protocol(port: &mut Box<dyn SerialPort>) -> io::Result<()> {
@@ -81,14 +81,14 @@ pub fn initialize_adapter(port: &mut Box<dyn SerialPort>) -> io::Result<()> {
 pub fn open_connection() -> Result<Box<dyn SerialPort>> {
     // Open the port
     let port = serialport::new(PORT_NAME, BAUD_RATE)
-        .timeout(Duration::from_millis(NORMAL_TIMEOUT.as_millis() as u64))
+        .timeout(Duration::from_millis(WARMUP_TIMEOUT.as_millis() as u64))
         .open()?;
 
     Ok(port)
 }
 
 // Sends a command to the open connection
-pub fn send_command(port: &mut impl Write, command: &str) -> io::Result<()> {
+pub fn send_command<T: Write + ?Sized>(port: &mut T, command: &str) -> io::Result<()> {
     port.write_all(command.as_bytes())?;
     port.flush()?;
 
@@ -97,7 +97,7 @@ pub fn send_command(port: &mut impl Write, command: &str) -> io::Result<()> {
 
 // Reads the adapter's response
 // Reads the adapter's response until the '>' prompt is found
-pub fn read_response(port: &mut impl Read) -> io::Result<String> {
+pub fn read_response<T: Read + ?Sized>(port: &mut T) -> io::Result<String> {
     let mut full_buffer = Vec::new();
     let mut single_byte = [0u8; 1]; // Read 1 byte at a time to check for the delimiter
 

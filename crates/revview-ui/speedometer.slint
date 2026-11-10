@@ -1,0 +1,84 @@
+
+import { VerticalBox, HorizontalBox } from "std-widgets.slint";
+
+export component Speedometer inherits Rectangle {
+    in property <bool> obd-connected;
+    in property <float> rpm;
+    in property <float> speed;
+
+    VerticalLayout {
+        alignment: center;
+
+        // Keep both displays together as one centered group
+        VerticalLayout {
+            alignment: center;
+            spacing: 12px;
+
+            // --- Speed Container ---
+            HorizontalLayout {
+                alignment: center;
+                spacing: 8px;
+
+                Text {
+                    text: "\{round(root.speed)}";
+                    font-size: 84px;
+                    font-weight: 900;
+                    color: #ffffff;
+                    vertical-alignment: center;
+                }
+
+                Text {
+                    text: "Kph";
+                    font-size: 32px;
+                    font-weight: 900;
+                    color: #ffffff;
+                    vertical-alignment: center;
+                }
+            }
+
+            // --- RPM Container ---
+            VerticalLayout {
+                alignment: center;
+                spacing: 8px;
+
+                Rectangle {
+                    x: (parent.width - self.width) / 2;
+                    width: parent.width * 0.85;
+                    height: 32px;
+                    background: #2e3748;
+                    border-radius: 4px;
+
+                    Rectangle {
+                        x: 0;
+                        y: 0;
+                        height: parent.height;
+                        width: parent.width * (root.rpm / 8000.0);
+                        background: root.rpm > 6000.0 ? #ef4444 : #00ffcc;
+                        border-radius: 4px;
+                    }
+                }
+
+                HorizontalLayout {
+                    alignment: center;
+                    spacing: 8px;
+
+                    Text {
+                        text: "\{round(root.rpm)}";
+                        font-size: 48px;
+                        font-weight: 900;
+                        color: root.rpm > 6000.0 ? #ef4444 : #ffffff;
+                        vertical-alignment: center;
+                    }
+
+                    Text {
+                        text: "RPM";
+                        font-size: 16px;
+                        font-weight: 900;
+                        color: root.rpm > 6000.0 ? #ef4444 : #ffffff;
+                        vertical-alignment: center;
+                    }
+                }
+            }
+        }
+    }
+}

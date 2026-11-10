@@ -1,0 +1,132 @@
+export component Telemetry inherits Rectangle {
+    // OBD-II values
+    in property <float> coolant-temp: 0.0;
+    in property <float> intake-temp: 0.0;
+    in property <float> throttle-position: 0.0;
+    in property <float> speed: 0.0;
+    in property <float> rpm: 0.0;
+
+    background: #1e1e2e;
+
+    GridLayout {
+        padding: 10px;
+        spacing: 10px;
+
+        // Equal-sized columns and rows
+        Row {
+            Rectangle {
+                background: #30394a;
+                border-radius: 10px;
+
+                VerticalLayout {
+                    alignment: center;
+                    spacing: 6px;
+
+                    Text {
+                        text: "COOLANT TEMP";
+                        font-size: 16px;
+                        font-weight: 800;
+                        color: #a6adc8;
+                        horizontal-alignment: center;
+                    }
+
+                    Text {
+                        text: "\{round(root.coolant-temp)} °C";
+                        font-size: 36px;
+                        font-weight: 900;
+                        color: #ffffff;
+                        horizontal-alignment: center;
+                    }
+                }
+            }
+
+            Rectangle {
+                background: #30394a;
+                border-radius: 10px;
+
+                VerticalLayout {
+                    alignment: center;
+                    spacing: 6px;
+
+                    Text {
+                        text: "INTAKE TEMP";
+                        font-size: 16px;
+                        font-weight: 800;
+                        color: #a6adc8;
+                        horizontal-alignment: center;
+                    }
+
+                    Text {
+                        text: "\{round(root.intake-temp)} °C";
+                        font-size: 36px;
+                        font-weight: 900;
+                        color: #ffffff;
+                        horizontal-alignment: center;
+                    }
+                }
+            }
+        }
+
+        Row {
+            Rectangle {
+                background: #30394a;
+                border-radius: 10px;
+
+                VerticalLayout {
+                    alignment: center;
+                    spacing: 6px;
+
+                    Text {
+                        text: "THROTTLE POSITION";
+                        font-size: 14px;
+                        font-weight: 800;
+                        color: #a6adc8;
+                        horizontal-alignment: center;
+                    }
+
+                    Text {
+                        text: "\{round(root.throttle-position)}%";
+                        font-size: 30px;
+                        font-weight: 900;
+                        color: #00ffcc;
+                        horizontal-alignment: center;
+                    }
+                }
+            }
+
+            Rectangle {
+                background: #30394a;
+                border-radius: 10px;
+
+                VerticalLayout {
+                    alignment: center;
+                    spacing: 8px;
+
+                    Text {
+                        text: "VEHICLE DATA";
+                        font-size: 16px;
+                        font-weight: 800;
+                        color: #a6adc8;
+                        horizontal-alignment: center;
+                    }
+
+                    Text {
+                        text: "\{round(root.speed)} KPH";
+                        font-size: 32px;
+                        font-weight: 900;
+                        color: #ffffff;
+                        horizontal-alignment: center;
+                    }
+
+                    Text {
+                        text: "\{round(root.rpm)} RPM";
+                        font-size: 24px;
+                        font-weight: 800;
+                        color: #ffffff;
+                        horizontal-alignment: center;
+                    }
+                }
+            }
+        }
+    }
+}
