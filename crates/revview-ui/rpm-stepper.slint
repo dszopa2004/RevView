@@ -1,0 +1,68 @@
+export component Stepper inherits Rectangle {
+    in-out property <int> value;
+    in property <int> minimum: 0;
+    in property <int> maximum: 100;
+    in property <int> step: 1;
+    in property <string> suffix: "";
+    callback edited(int);
+
+    height: 40px;
+    background: #2a2a2a;
+    border-radius: 6px;
+    border-width: 1px;
+    border-color: #444;
+
+    HorizontalLayout {
+        Rectangle {
+            width: 48px;
+            border-radius: 6px;
+            background: minus-area.pressed ? #4a4a4a : minus-area.has-hover ? #3a3a3a : transparent;
+
+            Text {
+                text: "−";
+                font-size: 22px;
+                color: root.value <= root.minimum ? #666 : white;
+                horizontal-alignment: center;
+                vertical-alignment: center;
+            }
+
+            minus-area := TouchArea {
+                enabled: root.value > root.minimum;
+                clicked => {
+                    root.value = max(root.minimum, root.value - root.step);
+                    root.edited(root.value);
+                }
+            }
+        }
+
+        Text {
+            text: "\{root.value}\{root.suffix}";
+            color: white;
+            horizontal-stretch: 1;
+            horizontal-alignment: center;
+            vertical-alignment: center;
+        }
+
+        Rectangle {
+            width: 48px;
+            border-radius: 6px;
+            background: plus-area.pressed ? #4a4a4a : plus-area.has-hover ? #3a3a3a : transparent;
+
+            Text {
+                text: "+";
+                font-size: 22px;
+                color: root.value >= root.maximum ? #666 : white;
+                horizontal-alignment: center;
+                vertical-alignment: center;
+            }
+
+            plus-area := TouchArea {
+                enabled: root.value < root.maximum;
+                clicked => {
+                    root.value = min(root.maximum, root.value + root.step);
+                    root.edited(root.value);
+                }
+            }
+        }
+    }
+}

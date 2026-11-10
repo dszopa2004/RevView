@@ -26,6 +26,7 @@ export component Dashboard inherits Window {
     in-out property <float> coolant-temp: 0.0;
     in-out property <float> intake-temp: 0.0;
     in-out property <float> throttle-position: 0.0;
+    in-out property <int> redline-rpm;
 
     in-out property <int> speed-unit: 0; // 0 = KPH, 1 = MPH
     in-out property <int> temp-unit: 0; // 0 = C, 1 = F
@@ -100,6 +101,7 @@ export component Dashboard inherits Window {
                 if root.current-view == 2: Settings {
                     speed-unit <=> root.speed-unit;
                     temp-unit <=> root.temp-unit;
+                    redline-rpm <=> root.redline-rpm;
 
                     settings-changed => {
                         root.settings-changed();

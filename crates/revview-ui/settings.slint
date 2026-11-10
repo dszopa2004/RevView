@@ -1,9 +1,11 @@
 
+import { Stepper } from "rpm-stepper.slint";
 export component Settings inherits Rectangle {
     callback settings-changed();
 
     in-out property <int> speed-unit: 0; // 0 = Kph, 1 = Mph
     in-out property <int> temp-unit: 0; // 0 = C, 1 = F
+    in-out property <int> redline-rpm: 6500;
 
     background: transparent;
 
@@ -185,6 +187,26 @@ export component Settings inherits Rectangle {
                         }
                     }
                 }
+            }
+        }
+
+        HorizontalLayout {
+            Text {
+                text: "Redline";
+                font-size: 16px;
+                font-weight: 800;
+                color: #ffffff;
+                vertical-alignment: center;
+            }
+
+            Stepper {
+                width: 180px;
+                value <=> root.redline-rpm;
+                minimum: 3000;
+                maximum: 10000;
+                step: 250;
+                suffix: " rpm";
+                edited(v) => { root.settings-changed(); }
             }
         }
     }

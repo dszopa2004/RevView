@@ -10,6 +10,7 @@ use config::FileSettingsStorage;
 use revview_core::{
     AppSettings, SettingsStorage, SpeedUnit, TemperatureUnit, VehicleTelemetry,
     calculations::{convert_speed, convert_temperature},
+    settings::{REDLINE_MAX, REDLINE_MIN},
 };
 use revview_obd::{
     connection::{initialize_adapter, open_connection, read_response, send_command},
@@ -49,6 +50,7 @@ fn main() -> Result<(), slint::PlatformError> {
         TemperatureUnit::Celsius => 0,
         TemperatureUnit::Fahrenheit => 1,
     });
+    app.set_redline_rpm(settings.redline_rpm.clamp(REDLINE_MIN, REDLINE_MAX) as i32);
 
     // Create a weak handle to safely pass across thread boundaries
     let app_weak = app.as_weak();
@@ -76,6 +78,7 @@ fn main() -> Result<(), slint::PlatformError> {
                     1 => TemperatureUnit::Fahrenheit,
                     _ => TemperatureUnit::Celsius,
                 },
+                redline_rpm: (ui.get_redline_rpm().max(0) as u32).clamp(REDLINE_MIN, REDLINE_MAX),
             };
 
             if let Err(e) = storage.save(&settings) {
