@@ -2,6 +2,7 @@
 import { HorizontalBox, VerticalBox, Button } from "std-widgets.slint";
 import { Telemetry } from "telemetry.slint";
 import { Speedometer } from "speedometer.slint";
+import { Settings } from "settings.slint";
 
 export component Dashboard inherits Window {
     preferred-width: 480px;
@@ -24,11 +25,11 @@ export component Dashboard inherits Window {
     in-out property <float> intake-temp: 0.0;
     in-out property <float> throttle-position: 0.0;
 
-    out property <int> max-view: 1;
+    out property <int> max-view: 2;
     out property <int> min-view: 0;
 
     // --- Main Dashboard ---
-    if root.obd-initialized: Rectangle {
+    if !root.obd-initialized: Rectangle {
         x: 12px;
         y: 12px;
         width: parent.width - 24px;
@@ -87,6 +88,8 @@ export component Dashboard inherits Window {
                     speed: root.speed;
                     rpm: root.rpm;
                 }
+
+                if root.current-view == 2: Settings { }
             }
 
             // --- Right Navigation ---
@@ -130,7 +133,7 @@ export component Dashboard inherits Window {
     }
 
     // --- Error Menu ---
-    if !root.obd-initialized: Rectangle {
+    if root.obd-initialized: Rectangle {
         x: 12px;
         y: 12px;
         width: parent.width - 24px;
