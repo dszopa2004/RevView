@@ -1,11 +1,16 @@
 // Application entry point. Initializes the UI and starts the application.
+mod config;
 
 use std::{
     thread,
     time::{Duration, Instant},
 };
 
-use revview_core::VehicleTelemetry;
+use config::FileSettingsStorage;
+use revview_core::{
+    AppSettings, SettingsStorage, SpeedUnit, TemperatureUnit, VehicleTelemetry,
+    calculations::{convert_speed, convert_temperature},
+};
 use revview_obd::{
     connection::{initialize_adapter, open_connection, read_response, send_command},
     parser,
@@ -15,10 +20,69 @@ use revview_obd::{
 slint::include_modules!();
 
 fn main() -> Result<(), slint::PlatformError> {
+    let storage = match FileSettingsStorage::new() {
+        Ok(storage) => Some(storage),
+        Err(e) => {
+            eprintln!("Could not initialize settings storage: {}", e);
+            None
+        }
+    };
+
+    let settings = match &storage {
+        Some(storage) => match storage.load() {
+            Ok(settings) => settings,
+            Err(e) => {
+                eprintln!("Could not load settings: {}", e);
+                AppSettings::default()
+            }
+        },
+        None => AppSettings::default(),
+    };
     let app = Dashboard::new()?;
+
+    // Apply saved settings once, on the main thread.
+    app.set_speed_unit(match settings.speed_unit {
+        SpeedUnit::Kph => 0,
+        SpeedUnit::Mph => 1,
+    });
+    app.set_temp_unit(match settings.temperature_unit {
+        TemperatureUnit::Celsius => 0,
+        TemperatureUnit::Fahrenheit => 1,
+    });
 
     // Create a weak handle to safely pass across thread boundaries
     let app_weak = app.as_weak();
+
+    app.on_settings_changed({
+        let storage = storage.clone();
+        let app_weak = app_weak.clone();
+
+        move || {
+            let Some(storage) = &storage else {
+                return;
+            };
+
+            let Some(ui) = app_weak.upgrade() else {
+                return;
+            };
+
+            let settings = AppSettings {
+                speed_unit: match ui.get_speed_unit() {
+                    1 => SpeedUnit::Mph,
+                    _ => SpeedUnit::Kph,
+                },
+
+                temperature_unit: match ui.get_temp_unit() {
+                    1 => TemperatureUnit::Fahrenheit,
+                    _ => TemperatureUnit::Celsius,
+                },
+            };
+
+            if let Err(e) = storage.save(&settings) {
+                eprintln!("Could not save settings: {}", e);
+            }
+        }
+    });
 
     // Spawn a background thread to handle the blocking OBD loop
     thread::spawn(move || {
@@ -81,10 +145,6 @@ fn main() -> Result<(), slint::PlatformError> {
                         let throttle_position = telemetry.throttle_position.unwrap_or(0.0);
 
                         update_ui(&app_weak, move |ui| {
-                            use revview_core::calculations::{
-                                SpeedUnit, TemperatureUnit, convert_speed, convert_temp,
-                            };
-
                             // Read the currently selected units from the UI.
                             let speed_unit = match ui.get_speed_unit() {
                                 1 => SpeedUnit::Mph,
@@ -96,10 +156,10 @@ fn main() -> Result<(), slint::PlatformError> {
                                 _ => TemperatureUnit::Celsius,
                             };
 
-                            // Convert measurements before displaying them.
                             let speed = convert_speed(speed_kph, speed_unit);
-                            let coolant_temp = convert_temp(coolant_temp_c, temperature_unit);
-                            let intake_temp = convert_temp(intake_temp_c, temperature_unit);
+                            let coolant_temp =
+                                convert_temperature(coolant_temp_c, temperature_unit);
+                            let intake_temp = convert_temperature(intake_temp_c, temperature_unit);
 
                             ui.set_rpm(rpm);
                             ui.set_speed(speed);

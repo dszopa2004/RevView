@@ -1,22 +1,11 @@
-// Performs calculations using vehicle measurements, such as unit conversions and derived values.
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum SpeedUnit {
-    Kph,
-    Mph,
-}
+use crate::settings::{SpeedUnit, TemperatureUnit};
 
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum TemperatureUnit {
-    Celsius,
-    Fahrenheit,
-}
-
-// Convert kilometers per hour to miles per hour
+// Convert kilometers per hour to miles per hour.
 pub fn kph_to_mph(kph: u16) -> f32 {
     kph as f32 / 1.609344
 }
 
-// Converts celsius to fahrenheit
+// Convert Celsius to Fahrenheit.
 pub fn celsius_to_fahrenheit(celsius: i16) -> f32 {
     (celsius as f32 * 9.0 / 5.0) + 32.0
 }
@@ -28,7 +17,7 @@ pub fn convert_speed(speed: u16, unit: SpeedUnit) -> f32 {
     }
 }
 
-pub fn convert_temp(temp: i16, unit: TemperatureUnit) -> f32 {
+pub fn convert_temperature(temp: i16, unit: TemperatureUnit) -> f32 {
     match unit {
         TemperatureUnit::Celsius => temp as f32,
         TemperatureUnit::Fahrenheit => celsius_to_fahrenheit(temp),

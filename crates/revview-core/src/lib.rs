@@ -2,8 +2,12 @@
 
 pub mod calculations;
 pub mod parameters;
+pub mod settings;
+pub mod storage;
 pub mod telemetry;
 
+pub use settings::{AppSettings, SpeedUnit, TemperatureUnit};
+pub use storage::SettingsStorage;
 pub use telemetry::VehicleTelemetry;
 
 pub fn add(left: u64, right: u64) -> u64 {

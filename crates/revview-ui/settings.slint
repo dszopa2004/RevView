@@ -1,5 +1,7 @@
 
 export component Settings inherits Rectangle {
+    callback settings-changed();
+
     in-out property <int> speed-unit: 0; // 0 = Kph, 1 = Mph
     in-out property <int> temp-unit: 0; // 0 = C, 1 = F
 
@@ -66,6 +68,7 @@ export component Settings inherits Rectangle {
                         TouchArea {
                             clicked => {
                                 root.speed-unit = 0;
+                                root.settings-changed();
                             }
                         }
                     }
@@ -94,6 +97,7 @@ export component Settings inherits Rectangle {
                         TouchArea {
                             clicked => {
                                 root.speed-unit = 1;
+                                root.settings-changed();
                             }
                         }
                     }
@@ -147,6 +151,7 @@ export component Settings inherits Rectangle {
                         TouchArea {
                             clicked => {
                                 root.temp-unit = 0;
+                                root.settings-changed();
                             }
                         }
                     }
@@ -175,6 +180,7 @@ export component Settings inherits Rectangle {
                         TouchArea {
                             clicked => {
                                 root.temp-unit = 1;
+                                root.settings-changed();
                             }
                         }
                     }

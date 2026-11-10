@@ -14,6 +14,8 @@ export component Dashboard inherits Window {
     maximized: true;
     background: #171a20;
 
+    callback settings-changed();
+
     // OBD-II Properties
     in-out property <bool> obd-connected: false;
     in-out property <bool> obd-initialized: false;
@@ -98,6 +100,10 @@ export component Dashboard inherits Window {
                 if root.current-view == 2: Settings {
                     speed-unit <=> root.speed-unit;
                     temp-unit <=> root.temp-unit;
+
+                    settings-changed => {
+                        root.settings-changed();
+                    }
                 }
             }
 
