@@ -5,6 +5,8 @@ export component Telemetry inherits Rectangle {
     in property <float> throttle-position: 0.0;
     in property <float> speed: 0.0;
     in property <float> rpm: 0.0;
+    in property <int> speed-unit;
+    in property <int> temp-unit;
 
     background: #1e1e2e;
 
@@ -31,7 +33,7 @@ export component Telemetry inherits Rectangle {
                     }
 
                     Text {
-                        text: "\{round(root.coolant-temp)} °C";
+                        text: "\{round(root.coolant-temp)} \{root.temp-unit == 0 ? "°C" : "°F"}";
                         font-size: 36px;
                         font-weight: 900;
                         color: #ffffff;
@@ -57,7 +59,7 @@ export component Telemetry inherits Rectangle {
                     }
 
                     Text {
-                        text: "\{round(root.intake-temp)} °C";
+                        text: "\{round(root.intake-temp)} \{root.temp-unit == 0 ? "°C" : "°F"}";
                         font-size: 36px;
                         font-weight: 900;
                         color: #ffffff;
@@ -111,7 +113,7 @@ export component Telemetry inherits Rectangle {
                     }
 
                     Text {
-                        text: "\{round(root.speed)} KPH";
+                        text: "\{round(root.speed)} \{root.speed-unit == 0 ? "KPH" : "MPH"}";
                         font-size: 32px;
                         font-weight: 900;
                         color: #ffffff;
