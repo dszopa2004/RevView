@@ -191,6 +191,9 @@ export component Settings inherits Rectangle {
         }
 
         HorizontalLayout {
+            alignment: center;
+            spacing: 16px;
+
             Text {
                 text: "Redline";
                 font-size: 16px;
@@ -200,7 +203,6 @@ export component Settings inherits Rectangle {
             }
 
             Stepper {
-                width: 180px;
                 value <=> root.redline-rpm;
                 minimum: 3000;
                 maximum: 10000;

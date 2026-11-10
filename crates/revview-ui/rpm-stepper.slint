@@ -6,22 +6,28 @@ export component Stepper inherits Rectangle {
     in property <string> suffix: "";
     callback edited(int);
 
-    height: 40px;
-    background: #2a2a2a;
-    border-radius: 6px;
+    background: #171a20;
+    border-color: #354152;
     border-width: 1px;
-    border-color: #444;
+    border-radius: 8px;
 
     HorizontalLayout {
+        spacing: 2px;
+
+        // Minus
         Rectangle {
-            width: 48px;
+            width: 36px;
+            height: 36px;
             border-radius: 6px;
-            background: minus-area.pressed ? #4a4a4a : minus-area.has-hover ? #3a3a3a : transparent;
+            background: minus-area.pressed ? #354152
+                : minus-area.has-hover && root.value > root.minimum ? #252b36
+                : transparent;
 
             Text {
                 text: "−";
-                font-size: 22px;
-                color: root.value <= root.minimum ? #666 : white;
+                font-size: 20px;
+                font-weight: 800;
+                color: root.value <= root.minimum ? #3d4655 : #8b95a5;
                 horizontal-alignment: center;
                 vertical-alignment: center;
             }
@@ -35,23 +41,35 @@ export component Stepper inherits Rectangle {
             }
         }
 
-        Text {
-            text: "\{root.value}\{root.suffix}";
-            color: white;
-            horizontal-stretch: 1;
-            horizontal-alignment: center;
-            vertical-alignment: center;
+        // Value (fixed width so the layout doesn't shift as digits change)
+        Rectangle {
+            width: 110px;
+            height: 36px;
+
+            Text {
+                text: "\{root.value}\{root.suffix}";
+                font-size: 15px;
+                font-weight: 800;
+                color: #00ffcc;
+                horizontal-alignment: center;
+                vertical-alignment: center;
+            }
         }
 
+        // Plus
         Rectangle {
-            width: 48px;
+            width: 36px;
+            height: 36px;
             border-radius: 6px;
-            background: plus-area.pressed ? #4a4a4a : plus-area.has-hover ? #3a3a3a : transparent;
+            background: plus-area.pressed ? #354152
+                : plus-area.has-hover && root.value < root.maximum ? #252b36
+                : transparent;
 
             Text {
                 text: "+";
-                font-size: 22px;
-                color: root.value >= root.maximum ? #666 : white;
+                font-size: 20px;
+                font-weight: 800;
+                color: root.value >= root.maximum ? #3d4655 : #8b95a5;
                 horizontal-alignment: center;
                 vertical-alignment: center;
             }
