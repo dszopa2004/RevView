@@ -25,6 +25,9 @@ export component Dashboard inherits Window {
     in-out property <float> intake-temp: 0.0;
     in-out property <float> throttle-position: 0.0;
 
+    in-out property <int> speed-unit: 0; // 0 = KPH, 1 = MPH
+    in-out property <int> temp-unit: 0; // 0 = C, 1 = F
+
     out property <int> max-view: 2;
     out property <int> min-view: 0;
 
@@ -89,7 +92,10 @@ export component Dashboard inherits Window {
                     rpm: root.rpm;
                 }
 
-                if root.current-view == 2: Settings { }
+                if root.current-view == 2: Settings {
+                    speed-unit <=> root.speed-unit;
+                    temp-unit <=> root.temp-unit;
+                }
             }
 
             // --- Right Navigation ---
