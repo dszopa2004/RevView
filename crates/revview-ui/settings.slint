@@ -206,7 +206,7 @@ export component Settings inherits Rectangle {
                 value <=> root.redline-rpm;
                 minimum: 3000;
                 maximum: 10000;
-                step: 250;
+                step: 500;
                 suffix: " rpm";
                 edited(v) => { root.settings-changed(); }
             }
