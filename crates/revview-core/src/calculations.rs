@@ -1,9 +1,11 @@
 // Performs calculations using vehicle measurements, such as unit conversions and derived values.
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum SpeedUnit {
     Kph,
     Mph,
 }
 
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum TemperatureUnit {
     Celsius,
     Fahrenheit,

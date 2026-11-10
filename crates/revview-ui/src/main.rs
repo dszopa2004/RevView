@@ -75,12 +75,32 @@ fn main() -> Result<(), slint::PlatformError> {
 
                         // Publish the latest collected telemetry.
                         let rpm = telemetry.rpm.unwrap_or(0) as f32;
-                        let speed = telemetry.speed_kph.unwrap_or(0) as f32;
-                        let coolant_temp = telemetry.coolant_temp_c.unwrap_or(0) as f32;
-                        let intake_temp = telemetry.intake_temp_c.unwrap_or(0) as f32;
+                        let speed_kph = telemetry.speed_kph.unwrap_or(0);
+                        let coolant_temp_c = telemetry.coolant_temp_c.unwrap_or(0);
+                        let intake_temp_c = telemetry.intake_temp_c.unwrap_or(0);
                         let throttle_position = telemetry.throttle_position.unwrap_or(0.0);
 
                         update_ui(&app_weak, move |ui| {
+                            use revview_core::calculations::{
+                                SpeedUnit, TemperatureUnit, convert_speed, convert_temp,
+                            };
+
+                            // Read the currently selected units from the UI.
+                            let speed_unit = match ui.get_speed_unit() {
+                                1 => SpeedUnit::Mph,
+                                _ => SpeedUnit::Kph,
+                            };
+
+                            let temperature_unit = match ui.get_temp_unit() {
+                                1 => TemperatureUnit::Fahrenheit,
+                                _ => TemperatureUnit::Celsius,
+                            };
+
+                            // Convert measurements before displaying them.
+                            let speed = convert_speed(speed_kph, speed_unit);
+                            let coolant_temp = convert_temp(coolant_temp_c, temperature_unit);
+                            let intake_temp = convert_temp(intake_temp_c, temperature_unit);
+
                             ui.set_rpm(rpm);
                             ui.set_speed(speed);
                             ui.set_coolant_temp(coolant_temp);

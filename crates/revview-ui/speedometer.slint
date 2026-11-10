@@ -5,6 +5,7 @@ export component Speedometer inherits Rectangle {
     in property <bool> obd-connected;
     in property <float> rpm;
     in property <float> speed;
+    in property <int> speed-unit;
 
     VerticalLayout {
         alignment: center;
@@ -28,7 +29,7 @@ export component Speedometer inherits Rectangle {
                 }
 
                 Text {
-                    text: "Kph";
+                    text: root.speed-unit == 0 ? "KPH" : "MPH";
                     font-size: 32px;
                     font-weight: 900;
                     color: #ffffff;
