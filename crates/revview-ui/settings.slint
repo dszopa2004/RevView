@@ -1,9 +1,77 @@
+import { ComboBox } from "std-widgets.slint";
 export component Settings inherits Rectangle {
+    in-out property <int> speed-unit: 0; // 0 = Kph, 1 = Mph
+    
     VerticalLayout {
         alignment: center;
         Text {
-            text: "Settings";
-            font-size: 32px;
+            VerticalLayout {
+                alignment: center;
+                spacing: 12px;
+                Text {
+                    text: "Settings";
+                    font-size: 32px;
+                    font-weight: 900;
+                    color: #ffffff;
+                    vertical-alignment: center;
+                    horizontal-alignment: center;
+                }
+
+                HorizontalLayout {
+                    Text {
+                        text: "Speed Units:";
+                        font-size: 24px;
+                        font-weight: 900;
+                        color: #ffffff;
+                        vertical-alignment: center;
+                        horizontal-alignment: center;
+                    }
+
+                    Rectangle {
+                        background: root.speed-unit == 0 ? #454545 : #252525;
+                        border-radius: 6px;
+                        border-width: 1px;
+                        border-color: #666666;
+                        width: 70px;
+                        height: 40px;
+
+                        Text {
+                            text: "Kph";
+                            color: #ffffff;
+                            horizontal-alignment: center;
+                            vertical-alignment: center;
+                        }
+
+                        TouchArea {
+                            clicked => {
+                                root.speed-unit = 0;
+                            }
+                        }
+                    }
+
+                    Rectangle {
+                        background: root.speed-unit == 1 ? #454545 : #252525;
+                        border-radius: 6px;
+                        border-width: 1px;
+                        border-color: #666666;
+                        width: 70px;
+                        height: 40px;
+
+                        Text {
+                            text: "Mph";
+                            color: #ffffff;
+                            horizontal-alignment: center;
+                            vertical-alignment: center;
+                        }
+
+                        TouchArea {
+                            clicked => {
+                                root.speed-unit = 1;
+                            }
+                        }
+                    }
+                }
+            }
         }
     }
 }
