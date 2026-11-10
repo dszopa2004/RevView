@@ -43,9 +43,9 @@ export component Stepper inherits Rectangle {
 
         // Value (fixed width so the layout doesn't shift as digits change)
         Rectangle {
-            width: 110px;
             height: 36px;
-
+            horizontal-stretch: 1;     // replaces width: 110px
+    
             Text {
                 text: "\{root.value}\{root.suffix}";
                 font-size: 15px;
