@@ -1,6 +1,7 @@
 
 export component Settings inherits Rectangle {
     in-out property <int> speed-unit: 0; // 0 = Kph, 1 = Mph
+    in-out property <int> temp-unit: 0; // 0 = C, 1 = F
 
     background: transparent;
 
@@ -25,7 +26,7 @@ export component Settings inherits Rectangle {
 
             Text {
                 text: "Speed Units";
-                font-size: 20px;
+                font-size: 16px;
                 font-weight: 800;
                 color: #ffffff;
                 vertical-alignment: center;
@@ -93,6 +94,87 @@ export component Settings inherits Rectangle {
                         TouchArea {
                             clicked => {
                                 root.speed-unit = 1;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        HorizontalLayout {
+            alignment: center;
+            spacing: 16px;
+
+            Text {
+                text: "Temperature Units";
+                font-size: 16px;
+                font-weight: 800;
+                color: #ffffff;
+                vertical-alignment: center;
+            }
+
+            // Temp
+            Rectangle {
+                background: #171a20;
+                border-color: #354152;
+                border-width: 1px;
+                border-radius: 8px;
+
+                HorizontalLayout {
+                    spacing: 2px;
+
+                    // Celsius
+                    Rectangle {
+                        width: 65px;
+                        height: 36px;
+                        border-radius: 6px;
+
+                        background: root.temp-unit == 0
+                            ? #354152
+                            : transparent;
+
+                        Text {
+                            text: "°C";
+                            font-size: 15px;
+                            font-weight: 800;
+                            color: root.temp-unit == 0
+                                ? #00ffcc
+                                : #8b95a5;
+                            horizontal-alignment: center;
+                            vertical-alignment: center;
+                        }
+
+                        TouchArea {
+                            clicked => {
+                                root.temp-unit = 0;
+                            }
+                        }
+                    }
+
+                    // Fahrenheit
+                    Rectangle {
+                        width: 65px;
+                        height: 36px;
+                        border-radius: 6px;
+
+                        background: root.temp-unit == 1
+                            ? #354152
+                            : transparent;
+
+                        Text {
+                            text: "°F";
+                            font-size: 15px;
+                            font-weight: 800;
+                            color: root.temp-unit == 1
+                                ? #00ffcc
+                                : #8b95a5;
+                            horizontal-alignment: center;
+                            vertical-alignment: center;
+                        }
+
+                        TouchArea {
+                            clicked => {
+                                root.temp-unit = 1;
                             }
                         }
                     }
