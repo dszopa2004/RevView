@@ -34,13 +34,14 @@ export component Dashboard inherits Window {
     in-out property <bool> show-settings: false;
     out property <int> max-view: 1;
     out property <int> min-view: 0;
+    property <length> margin: 36px;
 
     // --- Main Dashboard ---
     if !root.obd-initialized && !root.show-settings: Rectangle {
-        x: 12px;
-        y: 12px;
-        width: parent.width - 24px;
-        height: parent.height - 36px;
+        x: root.margin;
+        y: root.margin;
+        width: parent.width - 2 * root.margin;
+        height: parent.height - 2 * root.margin;
 
         background: #202630;
         border-color: #354152;
@@ -137,14 +138,14 @@ export component Dashboard inherits Window {
 
         x: 0px;
         width: parent.width;
-        y: parent.height - self.height - 4px;
+        y: parent.height - root.margin + (root.margin - self.height) / 2;
     }
 
     if !root.obd-initialized && root.show-settings: Rectangle {
-        x: 12px;
-        y: 12px;
-        width: parent.width - 24px;
-        height: parent.height - 36px;
+        x: root.margin;
+        y: root.margin;
+        width: parent.width - 2 * root.margin;
+        height: parent.height - 2 * root.margin;
         background: #202630;
         border-color: #354152;
         border-width: 1px;
@@ -161,19 +162,19 @@ export component Dashboard inherits Window {
 
     // --- Footer Settings Button ---
 if !root.obd-initialized && !root.show-settings: Rectangle {
-    // Invisible hit area, larger than the visible button
-    width: 64px;
+    // Hit area: reaches up into the card's 12px inner padding
+    width: 56px;
         height: 36px;
-        x: parent.width - self.width - 8px;
+        x: parent.width - root.margin - self.width;
         y: parent.height - self.height;
         background: transparent;
 
-        // Visible button
+        // Visible button, right edge lined up with the card's right edge
     Rectangle {
             width: 28px;
-            height: 20px;
-            x: (parent.width - self.width) / 2;
-            y: parent.height - self.height - 3px;
+            height: 16px;
+            x: parent.width - self.width;
+            y: parent.height - (root.margin + self.height) / 2;
             border-radius: 6px;
             background: gear-touch.pressed ? #45475a : #2a2b36;
             border-color: #354152;
@@ -181,7 +182,7 @@ if !root.obd-initialized && !root.show-settings: Rectangle {
 
             Text {
                 text: "⚙";
-                font-size: 14px;
+                font-size: 12px;
                 color: #8b95a5;
                 horizontal-alignment: center;
                 vertical-alignment: center;
@@ -195,10 +196,10 @@ if !root.obd-initialized && !root.show-settings: Rectangle {
 
     // --- Error Menu ---
     if root.obd-initialized: Rectangle {
-        x: 12px;
-        y: 12px;
-        width: parent.width - 24px;
-        height: parent.height - 36px;
+        x: root.margin;
+        y: root.margin;
+        width: parent.width - 2 * root.margin;
+        height: parent.height - 2 * root.margin;
 
         background: #202630;
         border-color: #354152;
