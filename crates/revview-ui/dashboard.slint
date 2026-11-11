@@ -160,21 +160,21 @@ export component Dashboard inherits Window {
         }
     }
 
-    // --- Footer Settings Button ---
+    // --- Top Settings Button ---
 if !root.obd-initialized && !root.show-settings: Rectangle {
-    // Hit area: reaches up into the card's 12px inner padding
+    // Hit area: window corner, reaching 12px down into the card's inner padding
     width: 56px;
         height: 36px;
-        x: parent.width - root.margin - self.width;
-        y: parent.height - self.height;
+        x: 0px;
+        y: 0px;
         background: transparent;
 
-        // Visible button, right edge lined up with the card's right edge
-    Rectangle {
+        // Visible button, 8px from the left and top edges
+        Rectangle {
             width: 28px;
-            height: 16px;
-            x: parent.width - self.width;
-            y: parent.height - (root.margin + self.height) / 2;
+            height: 28px;
+            x: 8px;
+            y: 8px;
             border-radius: 6px;
             background: gear-touch.pressed ? #45475a : #2a2b36;
             border-color: #354152;
