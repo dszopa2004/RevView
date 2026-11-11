@@ -31,11 +31,12 @@ export component Dashboard inherits Window {
     in-out property <int> speed-unit: 0; // 0 = KPH, 1 = MPH
     in-out property <int> temp-unit: 0; // 0 = C, 1 = F
 
-    out property <int> max-view: 2;
+    in-out property <bool> show-settings: false;
+    out property <int> max-view: 1;
     out property <int> min-view: 0;
 
     // --- Main Dashboard ---
-    if !root.obd-initialized: Rectangle {
+    if !root.obd-initialized && !root.show-settings: Rectangle {
         x: 12px;
         y: 12px;
         width: parent.width - 24px;
@@ -97,16 +98,6 @@ export component Dashboard inherits Window {
                     speed-unit: root.speed-unit;
                     temp-unit: root.temp-unit;
                 }
-
-                if root.current-view == 2: Settings {
-                    speed-unit <=> root.speed-unit;
-                    temp-unit <=> root.temp-unit;
-                    redline-rpm <=> root.redline-rpm;
-
-                    settings-changed => {
-                        root.settings-changed();
-                    }
-                }
             }
 
             // --- Right Navigation ---
@@ -147,6 +138,59 @@ export component Dashboard inherits Window {
         x: 0px;
         width: parent.width;
         y: parent.height - self.height - 4px;
+    }
+
+    if !root.obd-initialized && root.show-settings: Rectangle {
+        x: 12px;
+        y: 12px;
+        width: parent.width - 24px;
+        height: parent.height - 36px;
+        background: #202630;
+        border-color: #354152;
+        border-width: 1px;
+        border-radius: 16px;
+
+        Settings {
+            speed-unit <=> root.speed-unit;
+            temp-unit <=> root.temp-unit;
+            redline-rpm <=> root.redline-rpm;
+            settings-changed => { root.settings-changed(); }
+            back => { root.show-settings = false; }
+        }
+    }
+
+    // --- Footer Settings Button ---
+if !root.obd-initialized && !root.show-settings: Rectangle {
+    // Invisible hit area, larger than the visible button
+    width: 64px;
+        height: 36px;
+        x: parent.width - self.width - 8px;
+        y: parent.height - self.height;
+        background: transparent;
+
+        // Visible button
+    Rectangle {
+            width: 28px;
+            height: 20px;
+            x: (parent.width - self.width) / 2;
+            y: parent.height - self.height - 3px;
+            border-radius: 6px;
+            background: gear-touch.pressed ? #45475a : #2a2b36;
+            border-color: #354152;
+            border-width: 1px;
+
+            Text {
+                text: "⚙";
+                font-size: 14px;
+                color: #8b95a5;
+                horizontal-alignment: center;
+                vertical-alignment: center;
+            }
+        }
+
+        gear-touch := TouchArea {
+            clicked => { root.show-settings = true; }
+        }
     }
 
     // --- Error Menu ---

@@ -2,6 +2,7 @@ import { Stepper } from "rpm-stepper.slint";
 
 export component Settings inherits Rectangle {
     callback settings-changed();
+    callback back();
 
     in-out property <int> speed-unit: 0; // 0 = Kph, 1 = Mph
     in-out property <int> temp-unit: 0; // 0 = C, 1 = F
@@ -15,8 +16,8 @@ export component Settings inherits Rectangle {
 
     VerticalLayout {
         alignment: center;
-        spacing: 24px;
-        padding: 16px;
+        spacing: 12px;
+        padding: 12px;
 
         // Page heading
         Text {
@@ -220,6 +221,33 @@ export component Settings inherits Rectangle {
                 step: 500;
                 suffix: " rpm";
                 edited(v) => { root.settings-changed(); }
+            }
+        }
+
+        // Back button
+        HorizontalLayout {
+            alignment: center;
+
+            Rectangle {
+                width: 100px;
+                height: 36px;
+                border-radius: 8px;
+                background: back-touch.pressed ? #45475a : #2a2b36;
+                border-color: #354152;
+                border-width: 1px;
+
+                Text {
+                    text: "< Back";
+                    font-size: 16px;
+                    font-weight: 800;
+                    color: #00ffcc;
+                    horizontal-alignment: center;
+                    vertical-alignment: center;
+                }
+
+                back-touch := TouchArea {
+                    clicked => { root.back(); }
+                }
             }
         }
     }
