@@ -7,6 +7,7 @@ export component Settings inherits Rectangle {
     in-out property <int> speed-unit: 0; // 0 = Kph, 1 = Mph
     in-out property <int> temp-unit: 0; // 0 = C, 1 = F
     in-out property <int> redline-rpm: 6500;
+    in-out property <int> shift-rpm: 6500;
 
     // Shared sizes so every row lines up
     property <length> label-width: 130px;
@@ -216,6 +217,32 @@ export component Settings inherits Rectangle {
             Stepper {
                 width: root.control-width;
                 value <=> root.redline-rpm;
+                minimum: 3000;
+                maximum: 10000;
+                step: 500;
+                suffix: " rpm";
+                edited(v) => { root.settings-changed(); }
+            }
+        }
+
+        // Shift indicator setting
+        HorizontalLayout {
+            alignment: center;
+            spacing: 16px;
+
+            Text {
+                text: "Shift Indicator";
+                width: root.label-width;
+                font-size: 16px;
+                font-weight: 800;
+                color: #ffffff;
+                horizontal-alignment: right;
+                vertical-alignment: center;
+            }
+
+            Stepper {
+                width: root.control-width;
+                value <=> root.shift-rpm;
                 minimum: 3000;
                 maximum: 10000;
                 step: 500;
