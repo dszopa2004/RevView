@@ -44,6 +44,7 @@ pub struct AppSettings {
     pub temperature_unit: TemperatureUnit,
     pub redline_rpm: u32,
     pub shift_rpm: u32,
+    pub gauge_style: u32,
 }
 
 impl Default for AppSettings {
@@ -53,6 +54,7 @@ impl Default for AppSettings {
             temperature_unit: TemperatureUnit::default(),
             redline_rpm: 6500,
             shift_rpm: 6000,
+            gauge_style: 0,
         }
     }
 }
