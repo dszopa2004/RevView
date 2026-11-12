@@ -1,0 +1,86 @@
+export component Stepper inherits Rectangle {
+    in-out property <int> value;
+    in property <int> minimum: 0;
+    in property <int> maximum: 100;
+    in property <int> step: 1;
+    in property <string> suffix: "";
+    callback edited(int);
+
+    background: #171a20;
+    border-color: #354152;
+    border-width: 1px;
+    border-radius: 8px;
+
+    HorizontalLayout {
+        spacing: 2px;
+
+        // Minus
+        Rectangle {
+            width: 36px;
+            height: 36px;
+            border-radius: 6px;
+            background: minus-area.pressed ? #354152
+                : minus-area.has-hover && root.value > root.minimum ? #252b36
+                : transparent;
+
+            Text {
+                text: "−";
+                font-size: 20px;
+                font-weight: 800;
+                color: root.value <= root.minimum ? #3d4655 : #8b95a5;
+                horizontal-alignment: center;
+                vertical-alignment: center;
+            }
+
+            minus-area := TouchArea {
+                enabled: root.value > root.minimum;
+                clicked => {
+                    root.value = max(root.minimum, root.value - root.step);
+                    root.edited(root.value);
+                }
+            }
+        }
+
+        // Value (fixed width so the layout doesn't shift as digits change)
+        Rectangle {
+            height: 36px;
+            horizontal-stretch: 1;     // replaces width: 110px
+    
+            Text {
+                text: "\{root.value}\{root.suffix}";
+                font-size: 15px;
+                font-weight: 800;
+                color: #00ffcc;
+                horizontal-alignment: center;
+                vertical-alignment: center;
+            }
+        }
+
+        // Plus
+        Rectangle {
+            width: 36px;
+            height: 36px;
+            border-radius: 6px;
+            background: plus-area.pressed ? #354152
+                : plus-area.has-hover && root.value < root.maximum ? #252b36
+                : transparent;
+
+            Text {
+                text: "+";
+                font-size: 20px;
+                font-weight: 800;
+                color: root.value >= root.maximum ? #3d4655 : #8b95a5;
+                horizontal-alignment: center;
+                vertical-alignment: center;
+            }
+
+            plus-area := TouchArea {
+                enabled: root.value < root.maximum;
+                clicked => {
+                    root.value = min(root.maximum, root.value + root.step);
+                    root.edited(root.value);
+                }
+            }
+        }
+    }
+}

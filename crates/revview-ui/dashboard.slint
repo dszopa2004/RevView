@@ -2,6 +2,7 @@
 import { HorizontalBox, VerticalBox, Button } from "std-widgets.slint";
 import { Telemetry } from "telemetry.slint";
 import { Speedometer } from "speedometer.slint";
+import { Settings } from "settings.slint";
 
 export component Dashboard inherits Window {
     preferred-width: 480px;
@@ -13,6 +14,8 @@ export component Dashboard inherits Window {
     maximized: true;
     background: #171a20;
 
+    callback settings-changed();
+
     // OBD-II Properties
     in-out property <bool> obd-connected: false;
     in-out property <bool> obd-initialized: false;
@@ -23,16 +26,23 @@ export component Dashboard inherits Window {
     in-out property <float> coolant-temp: 0.0;
     in-out property <float> intake-temp: 0.0;
     in-out property <float> throttle-position: 0.0;
+    in-out property <int> redline-rpm;
+    in-out property <int> shift-rpm;
 
+    in-out property <int> speed-unit: 0; // 0 = KPH, 1 = MPH
+    in-out property <int> temp-unit: 0; // 0 = C, 1 = F
+
+    in-out property <bool> show-settings: false;
     out property <int> max-view: 1;
     out property <int> min-view: 0;
+    property <length> margin: 36px;
 
     // --- Main Dashboard ---
-    if root.obd-initialized: Rectangle {
-        x: 12px;
-        y: 12px;
-        width: parent.width - 24px;
-        height: parent.height - 36px;
+    if !root.obd-initialized && !root.show-settings: Rectangle {
+        x: root.margin;
+        y: root.margin;
+        width: parent.width - 2 * root.margin;
+        height: parent.height - 2 * root.margin;
 
         background: #202630;
         border-color: #354152;
@@ -78,6 +88,7 @@ export component Dashboard inherits Window {
                     obd-connected: root.obd-connected;
                     rpm: root.rpm;
                     speed: root.speed;
+                    speed-unit: root.speed-unit;
                 }
 
                 if root.current-view == 1: Telemetry {
@@ -86,6 +97,8 @@ export component Dashboard inherits Window {
                     throttle-position: root.throttle-position;
                     speed: root.speed;
                     rpm: root.rpm;
+                    speed-unit: root.speed-unit;
+                    temp-unit: root.temp-unit;
                 }
             }
 
@@ -126,15 +139,70 @@ export component Dashboard inherits Window {
 
         x: 0px;
         width: parent.width;
-        y: parent.height - self.height - 4px;
+        y: parent.height - root.margin + (root.margin - self.height) / 2;
+    }
+
+    if !root.obd-initialized && root.show-settings: Rectangle {
+        x: root.margin;
+        y: root.margin;
+        width: parent.width - 2 * root.margin;
+        height: parent.height - 2 * root.margin;
+        background: #202630;
+        border-color: #354152;
+        border-width: 1px;
+        border-radius: 16px;
+
+        // Set setting callback here
+        Settings {
+            speed-unit <=> root.speed-unit;
+            temp-unit <=> root.temp-unit;
+            redline-rpm <=> root.redline-rpm;
+            shift-rpm <=> root.shift-rpm;
+            settings-changed => { root.settings-changed(); }
+            back => { root.show-settings = false; }
+        }
+    }
+
+    // --- Top Settings Button ---
+if !root.obd-initialized && !root.show-settings: Rectangle {
+    // Hit area: window corner, reaching 12px down into the card's inner padding
+    width: 56px;
+        height: 36px;
+        x: 0px;
+        y: 0px;
+        background: transparent;
+
+        // Visible button, 8px from the left and top edges
+        Rectangle {
+            width: 28px;
+            height: 28px;
+            x: 8px;
+            y: 8px;
+            border-radius: 6px;
+            background: gear-touch.pressed ? #45475a : #2a2b36;
+            border-color: #354152;
+            border-width: 1px;
+
+            Text {
+                text: "⚙";
+                font-size: 12px;
+                color: #8b95a5;
+                horizontal-alignment: center;
+                vertical-alignment: center;
+            }
+        }
+
+        gear-touch := TouchArea {
+            clicked => { root.show-settings = true; }
+        }
     }
 
     // --- Error Menu ---
-    if !root.obd-initialized: Rectangle {
-        x: 12px;
-        y: 12px;
-        width: parent.width - 24px;
-        height: parent.height - 36px;
+    if root.obd-initialized: Rectangle {
+        x: root.margin;
+        y: root.margin;
+        width: parent.width - 2 * root.margin;
+        height: parent.height - 2 * root.margin;
 
         background: #202630;
         border-color: #354152;

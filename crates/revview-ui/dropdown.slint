@@ -1,0 +1,76 @@
+export component Dropdown inherits Rectangle {
+    in property <[string]> model;
+    in-out property <int> current-index: 0;
+    callback selected(int);
+
+    height: 36px;
+    background: #171a20;
+    border-color: #354152;
+    border-width: 1px;
+    border-radius: 8px;
+
+    Text {
+        x: 12px;
+        text: root.model[root.current-index];
+        font-size: 15px;
+        font-weight: 800;
+        color: #00ffcc;
+        vertical-alignment: center;
+    }
+
+    Text {
+        x: parent.width - self.width - 10px;
+        text: "▾";
+        font-size: 14px;
+        color: #8b95a5;
+        vertical-alignment: center;
+    }
+
+    TouchArea {
+        clicked => { popup.show(); }
+    }
+
+    popup := PopupWindow {
+        x: 0px;
+        y: root.height + 4px;
+        width: root.width;
+        height: root.model.length * 36px + 8px;
+        close-policy: close-on-click-outside;
+
+        Rectangle {
+            background: #202630;
+            border-color: #354152;
+            border-width: 1px;
+            border-radius: 8px;
+
+            VerticalLayout {
+                padding: 4px;
+
+                for item[i] in root.model: Rectangle {
+                    height: 36px;
+                    border-radius: 6px;
+                    background: item-touch.pressed ? #45475a
+                        : i == root.current-index ? #354152
+                        : transparent;
+
+                    Text {
+                        text: item;
+                        font-size: 15px;
+                        font-weight: 800;
+                        color: i == root.current-index ? #00ffcc : #ffffff;
+                        horizontal-alignment: center;
+                        vertical-alignment: center;
+                    }
+
+                    item-touch := TouchArea {
+                        clicked => {
+                            root.current-index = i;
+                            root.selected(i);
+                            popup.close();
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
