@@ -1,282 +1,166 @@
 import { Stepper } from "rpm-stepper.slint";
 import { Dropdown } from "dropdown.slint";
 
+// One grid cell: label on top, control underneath
+component SettingCell inherits VerticalLayout {
+    in property <string> label;
+    spacing: 4px;
+
+    Text {
+        text: root.label;
+        font-size: 14px;
+        font-weight: 800;
+        color: #ffffff;
+    }
+
+    @children
+}
+
+// Two-option toggle, fills the width of its cell
+component Segmented inherits Rectangle {
+    in property <string> left-text;
+    in property <string> right-text;
+    in-out property <int> value: 0;
+    callback changed();
+
+    height: 36px;
+    background: #171a20;
+    border-color: #354152;
+    border-width: 1px;
+    border-radius: 8px;
+
+    HorizontalLayout {
+        spacing: 2px;
+
+        Rectangle {
+            border-radius: 6px;
+            background: root.value == 0 ? #354152 : transparent;
+            Text {
+                text: root.left-text;
+                font-size: 15px;
+                font-weight: 800;
+                color: root.value == 0 ? #00ffcc : #8b95a5;
+                horizontal-alignment: center;
+                vertical-alignment: center;
+            }
+
+            TouchArea {
+                clicked => { root.value = 0; root.changed(); }
+            }
+        }
+
+        Rectangle {
+            border-radius: 6px;
+            background: root.value == 1 ? #354152 : transparent;
+            Text {
+                text: root.right-text;
+                font-size: 15px;
+                font-weight: 800;
+                color: root.value == 1 ? #00ffcc : #8b95a5;
+                horizontal-alignment: center;
+                vertical-alignment: center;
+            }
+
+            TouchArea {
+                clicked => { root.value = 1; root.changed(); }
+            }
+        }
+    }
+}
+
 export component Settings inherits Rectangle {
     callback settings-changed();
     callback back();
 
-    in-out property <int> speed-unit: 0; // 0 = Kph, 1 = Mph
-    in-out property <int> temp-unit: 0; // 0 = C, 1 = F
+    in-out property <int> speed-unit: 0;   // 0 = Kph, 1 = Mph
+    in-out property <int> temp-unit: 0;    // 0 = C, 1 = F
     in-out property <int> redline-rpm: 6500;
     in-out property <int> shift-rpm: 6500;
     in-out property <int> gauge-style: 0;
 
-    // Shared sizes so every row lines up
-    property <length> label-width: 130px;
-    property <length> control-width: 150px;
+    // Scroll height = rows * cell-height + gaps. Update when you add a row.
+    property <length> cell-height: 58px;
+    property <length> grid-spacing: 12px;
+    property <int> row-count: 3;
 
     background: transparent;
 
     VerticalLayout {
-        alignment: center;
-        spacing: 12px;
         padding: 12px;
+        spacing: 8px;
 
-        // Page heading
-        Text {
-            text: "Settings";
-            font-size: 32px;
-            font-weight: 900;
-            color: #ffffff;
-            horizontal-alignment: center;
-        }
+        // Scrollable settings grid
+        Flickable {
+            vertical-stretch: 1;
+            content-height: root.row-count * root.cell-height
+                + (root.row-count - 1) * root.grid-spacing;
 
-        // Speed unit setting
-        HorizontalLayout {
-            alignment: center;
-            spacing: 16px;
+            GridLayout {
+                spacing-horizontal: 12px;
+                spacing-vertical: root.grid-spacing;
 
-            Text {
-                text: "Speed Units";
-                width: root.label-width;
-                font-size: 16px;
-                font-weight: 800;
-                color: #ffffff;
-                horizontal-alignment: right;
-                vertical-alignment: center;
-            }
-
-            // Segmented control background
-            Rectangle {
-                width: root.control-width;
-                background: #171a20;
-                border-color: #354152;
-                border-width: 1px;
-                border-radius: 8px;
-
-                HorizontalLayout {
-                    spacing: 2px;
-
-                    // KPH
-                    Rectangle {
-                        height: 36px;
-                        border-radius: 6px;
-
-                        background: root.speed-unit == 0
-                            ? #354152
-                            : transparent;
-
-                        Text {
-                            text: "KPH";
-                            font-size: 15px;
-                            font-weight: 800;
-                            color: root.speed-unit == 0
-                                ? #00ffcc
-                                : #8b95a5;
-                            horizontal-alignment: center;
-                            vertical-alignment: center;
-                        }
-
-                        TouchArea {
-                            clicked => {
-                                root.speed-unit = 0;
-                                root.settings-changed();
-                            }
+                Row {
+                    SettingCell {
+                        label: "Speed Units";
+                        Segmented {
+                            left-text: "KPH";
+                            right-text: "MPH";
+                            value <=> root.speed-unit;
+                            changed => { root.settings-changed(); }
                         }
                     }
 
-                    // MPH
-                    Rectangle {
-                        height: 36px;
-                        border-radius: 6px;
-
-                        background: root.speed-unit == 1
-                            ? #354152
-                            : transparent;
-
-                        Text {
-                            text: "MPH";
-                            font-size: 15px;
-                            font-weight: 800;
-                            color: root.speed-unit == 1
-                                ? #00ffcc
-                                : #8b95a5;
-                            horizontal-alignment: center;
-                            vertical-alignment: center;
+                    SettingCell {
+                        label: "Temperature Units";
+                        Segmented {
+                            left-text: "°C";
+                            right-text: "°F";
+                            value <=> root.temp-unit;
+                            changed => { root.settings-changed(); }
                         }
+                    }
+                }
 
-                        TouchArea {
-                            clicked => {
-                                root.speed-unit = 1;
-                                root.settings-changed();
-                            }
+                Row {
+                    SettingCell {
+                        label: "Redline";
+                        Stepper {
+                            value <=> root.redline-rpm;
+                            minimum: 3000;
+                            maximum: 10000;
+                            step: 500;
+                            suffix: " rpm";
+                            edited(v) => { root.settings-changed(); }
+                        }
+                    }
+
+                    SettingCell {
+                        label: "Shift Indicator";
+                        Stepper {
+                            value <=> root.shift-rpm;
+                            minimum: 3000;
+                            maximum: 10000;
+                            step: 500;
+                            suffix: " rpm";
+                            edited(v) => { root.settings-changed(); }
+                        }
+                    }
+                }
+
+                Row {
+                    SettingCell {
+                        label: "Gauge Style";
+                        Dropdown {
+                            model: ["Bar", "Arc", "Digital"];
+                            current-index <=> root.gauge-style;
+                            selected(i) => { root.settings-changed(); }
                         }
                     }
                 }
             }
         }
 
-        // Temperature unit setting
-        HorizontalLayout {
-            alignment: center;
-            spacing: 16px;
-
-            Text {
-                text: "Temperature Units";
-                width: root.label-width;
-                font-size: 16px;
-                font-weight: 800;
-                color: #ffffff;
-                horizontal-alignment: right;
-                vertical-alignment: center;
-            }
-
-            // Segmented control background
-            Rectangle {
-                width: root.control-width;
-                background: #171a20;
-                border-color: #354152;
-                border-width: 1px;
-                border-radius: 8px;
-
-                HorizontalLayout {
-                    spacing: 2px;
-
-                    // Celsius
-                    Rectangle {
-                        height: 36px;
-                        border-radius: 6px;
-
-                        background: root.temp-unit == 0
-                            ? #354152
-                            : transparent;
-
-                        Text {
-                            text: "°C";
-                            font-size: 15px;
-                            font-weight: 800;
-                            color: root.temp-unit == 0
-                                ? #00ffcc
-                                : #8b95a5;
-                            horizontal-alignment: center;
-                            vertical-alignment: center;
-                        }
-
-                        TouchArea {
-                            clicked => {
-                                root.temp-unit = 0;
-                                root.settings-changed();
-                            }
-                        }
-                    }
-
-                    // Fahrenheit
-                    Rectangle {
-                        height: 36px;
-                        border-radius: 6px;
-
-                        background: root.temp-unit == 1
-                            ? #354152
-                            : transparent;
-
-                        Text {
-                            text: "°F";
-                            font-size: 15px;
-                            font-weight: 800;
-                            color: root.temp-unit == 1
-                                ? #00ffcc
-                                : #8b95a5;
-                            horizontal-alignment: center;
-                            vertical-alignment: center;
-                        }
-
-                        TouchArea {
-                            clicked => {
-                                root.temp-unit = 1;
-                                root.settings-changed();
-                            }
-                        }
-                    }
-                }
-            }
-        }
-
-        // Gauge style setting
-        HorizontalLayout {
-            alignment: center;
-            spacing: 16px;
-
-            Text {
-                text: "Gauge Style";
-                width: root.label-width;
-                font-size: 16px;
-                font-weight: 800;
-                color: #ffffff;
-                horizontal-alignment: right;
-                vertical-alignment: center;
-            }
-
-            Dropdown {
-                width: root.control-width;
-                model: ["Bar", "Arc", "Digital"];
-                current-index <=> root.gauge-style;
-                selected(i) => { root.settings-changed(); }
-            }
-        }
-
-        // Redline setting
-        HorizontalLayout {
-            alignment: center;
-            spacing: 16px;
-
-            Text {
-                text: "Redline";
-                width: root.label-width;
-                font-size: 16px;
-                font-weight: 800;
-                color: #ffffff;
-                horizontal-alignment: right;
-                vertical-alignment: center;
-            }
-
-            Stepper {
-                width: root.control-width;
-                value <=> root.redline-rpm;
-                minimum: 3000;
-                maximum: 10000;
-                step: 500;
-                suffix: " rpm";
-                edited(v) => { root.settings-changed(); }
-            }
-        }
-
-        // Shift indicator setting
-        HorizontalLayout {
-            alignment: center;
-            spacing: 16px;
-
-            Text {
-                text: "Shift Indicator";
-                width: root.label-width;
-                font-size: 16px;
-                font-weight: 800;
-                color: #ffffff;
-                horizontal-alignment: right;
-                vertical-alignment: center;
-            }
-
-            Stepper {
-                width: root.control-width;
-                value <=> root.shift-rpm;
-                minimum: 3000;
-                maximum: 10000;
-                step: 500;
-                suffix: " rpm";
-                edited(v) => { root.settings-changed(); }
-            }
-        }
-
-        // Back button
+        // Pinned back button
         HorizontalLayout {
             alignment: center;
 
@@ -289,7 +173,7 @@ export component Settings inherits Rectangle {
                 border-width: 1px;
 
                 Text {
-                    text: "< Back";
+                    text: "Back";
                     font-size: 16px;
                     font-weight: 800;
                     color: #00ffcc;
