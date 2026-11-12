@@ -57,7 +57,7 @@ component ShiftLights inherits VerticalLayout {
     in property <int> redline-rpm;
     in property <int> shift-rpm;
 
-    property <int> count: 10;
+    property <int> count: 8;
     property <float> start-rpm: root.shift-rpm * 0.6;
 
     alignment: center;
@@ -72,7 +72,7 @@ component ShiftLights inherits VerticalLayout {
                 + (root.shift-rpm - root.start-rpm) * i / (root.count - 1);
             property <color> on-color: root.rpm >= root.redline-rpm ? #ef4444
                 : i < 4 ? #4ade80
-                : i < 7 ? #fbbf24
+                : i < 6 ? #fbbf24
                 : #ef4444;
 
             width: 28px;
