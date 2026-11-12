@@ -1,4 +1,5 @@
 import { Stepper } from "rpm-stepper.slint";
+import { Dropdown } from "dropdown.slint";
 
 export component Settings inherits Rectangle {
     callback settings-changed();
@@ -8,6 +9,7 @@ export component Settings inherits Rectangle {
     in-out property <int> temp-unit: 0; // 0 = C, 1 = F
     in-out property <int> redline-rpm: 6500;
     in-out property <int> shift-rpm: 6500;
+    in-out property <int> gauge-style: 0;
 
     // Shared sizes so every row lines up
     property <length> label-width: 130px;
@@ -196,6 +198,29 @@ export component Settings inherits Rectangle {
                         }
                     }
                 }
+            }
+        }
+
+        // Gauge style setting
+        HorizontalLayout {
+            alignment: center;
+            spacing: 16px;
+
+            Text {
+                text: "Gauge Style";
+                width: root.label-width;
+                font-size: 16px;
+                font-weight: 800;
+                color: #ffffff;
+                horizontal-alignment: right;
+                vertical-alignment: center;
+            }
+
+            Dropdown {
+                width: root.control-width;
+                model: ["Bar", "Arc", "Digital"];
+                current-index <=> root.gauge-style;
+                selected(i) => { root.settings-changed(); }
             }
         }
 
