@@ -13,6 +13,11 @@ pub const ECHO_OFF_COMMAND: &str = "ATE0\r";
 pub const AUTO_PROTOCOL_SELECT_COMMAND: &str = "ATSP0\r";
 pub const IDENTIFY_ADAPTER_COMMAND: &str = "ATI\r";
 
+// Engine code commands
+pub const STORED_CODES_COMMAND: &str = "03\r";
+pub const PENDING_CODES_COMMAND: &str = "07\r";
+pub const PERMANENT_CODES_COMMAND: &str = "0A\r";
+
 // 41 0C 1F 40
 // 41 = Positive response to Mode 01
 // 0C = RPM PID
