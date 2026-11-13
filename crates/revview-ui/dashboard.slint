@@ -3,6 +3,7 @@ import { HorizontalBox, VerticalBox, Button } from "std-widgets.slint";
 import { Telemetry } from "telemetry.slint";
 import { Speedometer } from "speedometer.slint";
 import { Settings } from "settings.slint";
+import { Diagnostics } from "diagnostics.slint";
 
 export component Dashboard inherits Window {
     preferred-width: 480px;
@@ -35,7 +36,7 @@ export component Dashboard inherits Window {
     in-out property <int> temp-unit: 0; // 0 = C, 1 = F
 
     in-out property <bool> show-settings: false;
-    out property <int> max-view: 1;
+    out property <int> max-view: 2;
     out property <int> min-view: 0;
     property <length> margin: 36px;
 
@@ -105,6 +106,8 @@ export component Dashboard inherits Window {
                     speed-unit: root.speed-unit;
                     temp-unit: root.temp-unit;
                 }
+
+                if root.current-view == 2: Diagnostics { }
             }
 
             // --- Right Navigation ---

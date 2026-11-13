@@ -1,0 +1,266 @@
+export struct DiagnosticEntry {
+    code: string,   // "P0133"
+    kind: string,   // "Stored" | "Pending" | "Permanent"
+}
+
+// Same look as the Back button in settings
+component ActionButton inherits Rectangle {
+    in property <string> text;
+    in property <length> text-size: 16px;
+    callback clicked();
+
+    background: touch.pressed ? #45475a : #2a2b36;
+    border-color: #354152;
+    border-width: 1px;
+    border-radius: 8px;
+
+    Text {
+        text: root.text;
+        font-size: root.text-size;
+        font-weight: 800;
+        color: #00ffcc;
+        horizontal-alignment: center;
+        vertical-alignment: center;
+    }
+
+    touch := TouchArea {
+        clicked => { root.clicked(); }
+    }
+}
+
+// Indeterminate loading bar: a segment sweeps left to right on a loop
+component IndeterminateBar inherits Rectangle {
+    property <float> t: mod(animation-tick() / 1.4s, 1.0);
+
+    background: #2e3748;
+    border-radius: self.height / 2;
+    clip: true;
+
+    Rectangle {
+        width: parent.width * 0.35;
+        x: -self.width + (parent.width + self.width) * root.t;
+        background: #00ffcc;
+        border-radius: self.height / 2;
+    }
+}
+
+export component Diagnostics inherits Rectangle {
+    // 0 = idle, 1 = running, 2 = done, 3 = failed
+    in-out property <int> state: 0;
+    in property <[DiagnosticEntry]> entries: [
+        // TEMPORARY sample data for previewing. Delete once the backend fills this in.
+        { code: "P0133", kind: "Stored" },
+        { code: "P0420", kind: "Stored" },
+        { code: "P0301", kind: "Pending" },
+        { code: "P0171", kind: "Pending" },
+        { code: "U0100", kind: "Permanent" },
+        { code: "P0442", kind: "Permanent" },
+    ];
+    callback run-requested();
+
+    // Same scaling idea as the gauges: 300x224 is the design size
+    property <float> k: min(self.width / 300px, self.height / 224px);
+    property <length> row-height: 40px * root.k;
+    property <length> row-spacing: 6px * root.k;
+
+    // TEMPORARY: fakes a 3 second scan so you can preview the flow.
+    // Delete once the backend drives `state`.
+    Timer {
+        interval: 3s;
+        running: root.state == 1;
+        triggered => { root.state = 2; }
+    }
+
+    // --- Idle / failed: centered button ---
+    if root.state == 0 || root.state == 3: VerticalLayout {
+        alignment: center;
+        spacing: 12px * root.k;
+        padding: 12px * root.k;
+
+        Text {
+            text: "Diagnostics";
+            font-size: 24px * root.k;
+            font-weight: 900;
+            color: #ffffff;
+            horizontal-alignment: center;
+        }
+
+        Text {
+            text: root.state == 3
+                ? "Couldn't read codes. Check the adapter and try again."
+                : "Reads stored, pending and permanent codes.";
+            font-size: 12px * root.k;
+            font-weight: 800;
+            color: root.state == 3 ? #ef4444 : #8b95a5;
+            horizontal-alignment: center;
+            wrap: word-wrap;
+        }
+
+        HorizontalLayout {
+            alignment: center;
+
+            ActionButton {
+                width: 200px * root.k;
+                height: 48px * root.k;
+                text: root.state == 3 ? "Try Again" : "Run Diagnostic";
+                text-size: 18px * root.k;
+                clicked => {
+                    root.state = 1;
+                    root.run-requested();
+                }
+            }
+        }
+    }
+
+    // --- Running: loading bar ---
+    if root.state == 1: VerticalLayout {
+        alignment: center;
+        spacing: 14px * root.k;
+
+        Text {
+            text: "Reading codes…";
+            font-size: 16px * root.k;
+            font-weight: 800;
+            color: #ffffff;
+            horizontal-alignment: center;
+        }
+
+        HorizontalLayout {
+            alignment: center;
+
+            IndeterminateBar {
+                width: 200px * root.k;
+                height: 8px * root.k;
+            }
+        }
+    }
+
+    // --- Done, no codes ---
+    if root.state == 2 && root.entries.length == 0: VerticalLayout {
+        alignment: center;
+        spacing: 14px * root.k;
+
+        Text {
+            text: "No trouble codes found";
+            font-size: 20px * root.k;
+            font-weight: 900;
+            color: #4ade80;
+            horizontal-alignment: center;
+        }
+
+        HorizontalLayout {
+            alignment: center;
+
+            ActionButton {
+                width: 120px * root.k;
+                height: 36px * root.k;
+                text: "Run Again";
+                text-size: 14px * root.k;
+                clicked => {
+                    root.state = 1;
+                    root.run-requested();
+                }
+            }
+        }
+    }
+
+    // --- Done, with codes: header + scrollable list ---
+    if root.state == 2 && root.entries.length > 0: VerticalLayout {
+        padding: 12px * root.k;
+        spacing: 8px * root.k;
+
+        HorizontalLayout {
+            spacing: 8px * root.k;
+
+            Text {
+                text: root.entries.length == 1
+                    ? "1 code found"
+                    : "\{root.entries.length} codes found";
+                font-size: 18px * root.k;
+                font-weight: 900;
+                color: #fbbf24;
+                vertical-alignment: center;
+                horizontal-stretch: 1;
+            }
+
+            ActionButton {
+                width: 90px * root.k;
+                height: 32px * root.k;
+                text: "Run Again";
+                text-size: 13px * root.k;
+                clicked => {
+                    root.state = 1;
+                    root.run-requested();
+                }
+            }
+        }
+
+        Rectangle {
+            vertical-stretch: 1;
+            clip: true;
+
+            flick := Flickable {
+                content-height: root.entries.length * (root.row-height + root.row-spacing);
+
+                for entry[i] in root.entries: Rectangle {
+                    // Leave a small gutter on the right for the scroll indicator
+                    width: flick.width - 10px * root.k;
+                    height: root.row-height;
+                    y: i * (root.row-height + root.row-spacing);
+                    background: #2a2b36;
+                    border-radius: 8px * root.k;
+
+                    property <color> accent: entry.kind == "Pending" ? #fbbf24
+                        : entry.kind == "Permanent" ? #a78bfa
+                        : #ef4444;
+
+                    HorizontalLayout {
+                        padding-left: 12px * root.k;
+                        padding-right: 10px * root.k;
+                        spacing: 10px * root.k;
+
+                        Text {
+                            text: entry.code;
+                            font-size: 20px * root.k;
+                            font-weight: 900;
+                            color: #ffffff;
+                            vertical-alignment: center;
+                            horizontal-stretch: 1;
+                        }
+
+                        VerticalLayout {
+                            alignment: center;
+
+                            Rectangle {
+                                width: 84px * root.k;
+                                height: 22px * root.k;
+                                background: accent.with-alpha(0.2);
+                                border-radius: self.height / 2;
+
+                                Text {
+                                    text: entry.kind;
+                                    font-size: 12px * root.k;
+                                    font-weight: 800;
+                                    color: accent;
+                                    horizontal-alignment: center;
+                                    vertical-alignment: center;
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+
+            // Thin scroll indicator, only shown when the list overflows
+            Rectangle {
+                visible: flick.content-height > flick.height;
+                width: 3px * root.k;
+                x: parent.width - self.width;
+                y: flick.height * (-flick.content-y / flick.content-height);
+                height: flick.height * (flick.height / flick.content-height);
+                background: #354152;
+                border-radius: self.width / 2;
+            }
+        }
+    }
+}
