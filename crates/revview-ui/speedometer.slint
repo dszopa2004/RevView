@@ -201,7 +201,12 @@ export component Speedometer inherits Rectangle {
     property <float> k: min(self.width / 300px, self.height / 224px);
 
     if root.gauge-style == 1: ArcGauge {
-        // ...unchanged
+        rpm: root.rpm;
+        speed: root.speed;
+        unit-text: root.speed-unit == 0 ? "KPH" : "MPH";
+        max-rpm: root.max-rpm;
+        redline-rpm: root.redline-rpm;
+        shift-rpm: root.shift-rpm;
     }
 
     if root.gauge-style != 1: VerticalLayout {
