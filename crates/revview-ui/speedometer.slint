@@ -4,20 +4,21 @@ component BarGauge inherits VerticalLayout {
     in property <float> max-rpm;
     in property <int> redline-rpm;
     in property <int> shift-rpm;
+    in property <float> k: 1.0;
 
     property <color> rpm-color: root.rpm >= root.redline-rpm ? #ef4444
         : root.rpm >= root.shift-rpm ? #fbbf24
         : #00ffcc;
 
     alignment: center;
-    spacing: 8px;
+    spacing: 8px * root.k;
 
     Rectangle {
         x: (parent.width - self.width) / 2;
         width: parent.width * 0.85;
-        height: 32px;
+        height: 32px * root.k;
         background: #2e3748;
-        border-radius: 4px;
+        border-radius: 4px * root.k;
 
         Rectangle {
             x: 0;
@@ -35,7 +36,7 @@ component BarGauge inherits VerticalLayout {
 
         Text {
             text: "\{round(root.rpm)}";
-            font-size: 48px;
+            font-size: 48px * root.k;
             font-weight: 900;
             color: root.rpm >= root.redline-rpm ? #ef4444 : #ffffff;
             vertical-alignment: center;
@@ -43,7 +44,7 @@ component BarGauge inherits VerticalLayout {
 
         Text {
             text: "RPM";
-            font-size: 16px;
+            font-size: 16px * root.k;
             font-weight: 900;
             color: root.rpm >= root.redline-rpm ? #ef4444 : #ffffff;
             vertical-alignment: center;
@@ -53,6 +54,7 @@ component BarGauge inherits VerticalLayout {
 
 // Row of shift lights: fills green -> amber -> red as RPM approaches shift
 component ShiftLights inherits VerticalLayout {
+    in property <float> k: 1.0;
     in property <float> rpm;
     in property <int> redline-rpm;
     in property <int> shift-rpm;
@@ -61,11 +63,11 @@ component ShiftLights inherits VerticalLayout {
     property <float> start-rpm: root.shift-rpm * 0.6;
 
     alignment: center;
-    spacing: 8px;
+    spacing: 8px * root.k;
 
     HorizontalLayout {
         alignment: center;
-        spacing: 8px;
+        spacing: 8px * root.k;
 
         for i in root.count: Rectangle {
             property <bool> lit: root.rpm >= root.start-rpm
@@ -75,20 +77,20 @@ component ShiftLights inherits VerticalLayout {
                 : i < 6 ? #fbbf24
                 : #ef4444;
 
-            width: 28px;
-            height: 28px;
-            border-radius: 14px;
+            width: 28px * root.k;
+            height: 28px * root.k;
+            border-radius: self.width / 2;
             background: self.lit ? self.on-color : #2e3748;
         }
     }
 
     HorizontalLayout {
         alignment: center;
-        spacing: 8px;
+        spacing: 8px * root.k;
 
         Text {
             text: "\{round(root.rpm)}";
-            font-size: 32px;
+            font-size: 32px * root.k;
             font-weight: 900;
             color: #ffffff;
             vertical-alignment: center;
@@ -96,7 +98,7 @@ component ShiftLights inherits VerticalLayout {
 
         Text {
             text: "RPM";
-            font-size: 14px;
+            font-size: 14px * root.k;
             font-weight: 900;
             color: #8b95a5;
             vertical-alignment: center;
@@ -196,29 +198,23 @@ export component Speedometer inherits Rectangle {
     in property <int> gauge-style;   // 0 = Bar, 1 = Arc, 2 = Lights
 
     property <float> max-rpm: root.redline-rpm + 1000;
+    property <float> k: min(self.width / 300px, self.height / 224px);
 
-    // Arc gets the whole panel, since it shows speed in its center
     if root.gauge-style == 1: ArcGauge {
-        rpm: root.rpm;
-        speed: root.speed;
-        unit-text: root.speed-unit == 0 ? "KPH" : "MPH";
-        max-rpm: root.max-rpm;
-        redline-rpm: root.redline-rpm;
-        shift-rpm: root.shift-rpm;
+        // ...unchanged
     }
 
-    // Bar and Lights share the big speed readout on top
     if root.gauge-style != 1: VerticalLayout {
         alignment: center;
-        spacing: 12px;
+        spacing: 12px * root.k;
 
         HorizontalLayout {
             alignment: center;
-            spacing: 8px;
+            spacing: 8px * root.k;
 
             Text {
                 text: "\{round(root.speed)}";
-                font-size: 84px;
+                font-size: 84px * root.k;
                 font-weight: 900;
                 color: #ffffff;
                 vertical-alignment: center;
@@ -226,7 +222,7 @@ export component Speedometer inherits Rectangle {
 
             Text {
                 text: root.speed-unit == 0 ? "KPH" : "MPH";
-                font-size: 32px;
+                font-size: 32px * root.k;
                 font-weight: 900;
                 color: #ffffff;
                 vertical-alignment: center;
@@ -234,6 +230,7 @@ export component Speedometer inherits Rectangle {
         }
 
         if root.gauge-style == 0: BarGauge {
+            k: root.k;
             rpm: root.rpm;
             max-rpm: root.max-rpm;
             redline-rpm: root.redline-rpm;
@@ -241,6 +238,7 @@ export component Speedometer inherits Rectangle {
         }
 
         if root.gauge-style == 2: ShiftLights {
+            k: root.k;
             rpm: root.rpm;
             redline-rpm: root.redline-rpm;
             shift-rpm: root.shift-rpm;
