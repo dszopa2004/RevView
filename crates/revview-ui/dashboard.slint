@@ -7,6 +7,7 @@ import { Settings } from "settings.slint";
 export component Dashboard inherits Window {
     preferred-width: 480px;
     preferred-height: 320px;
+    default-font-size: min(self.width / 480px, self.height / 320px) * 10px;
 
     min-width: 480px;
     min-height: 320px;
@@ -28,6 +29,7 @@ export component Dashboard inherits Window {
     in-out property <float> throttle-position: 0.0;
     in-out property <int> redline-rpm;
     in-out property <int> shift-rpm;
+    in-out property <int> gauge-style;
 
     in-out property <int> speed-unit: 0; // 0 = KPH, 1 = MPH
     in-out property <int> temp-unit: 0; // 0 = C, 1 = F
@@ -89,6 +91,9 @@ export component Dashboard inherits Window {
                     rpm: root.rpm;
                     speed: root.speed;
                     speed-unit: root.speed-unit;
+                    redline-rpm: root.redline-rpm;
+                    shift-rpm: root.shift-rpm;
+                    gauge-style: root.gauge-style;
                 }
 
                 if root.current-view == 1: Telemetry {
@@ -158,6 +163,7 @@ export component Dashboard inherits Window {
             temp-unit <=> root.temp-unit;
             redline-rpm <=> root.redline-rpm;
             shift-rpm <=> root.shift-rpm;
+            gauge-style <=> root.gauge-style;
             settings-changed => { root.settings-changed(); }
             back => { root.show-settings = false; }
         }

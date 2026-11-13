@@ -1,85 +1,252 @@
+// Color logic shared by all styles: teal -> amber at shift -> red at redline
+component BarGauge inherits VerticalLayout {
+    in property <float> rpm;
+    in property <float> max-rpm;
+    in property <int> redline-rpm;
+    in property <int> shift-rpm;
+    in property <float> k: 1.0;
 
-import { VerticalBox, HorizontalBox } from "std-widgets.slint";
+    property <color> rpm-color: root.rpm >= root.redline-rpm ? #ef4444
+        : root.rpm >= root.shift-rpm ? #fbbf24
+        : #00ffcc;
+
+    alignment: center;
+    spacing: 8px * root.k;
+
+    Rectangle {
+        x: (parent.width - self.width) / 2;
+        width: parent.width * 0.85;
+        height: 32px * root.k;
+        background: #2e3748;
+        border-radius: 4px * root.k;
+
+        Rectangle {
+            x: 0;
+            y: 0;
+            height: parent.height;
+            width: parent.width * min(root.rpm / root.max-rpm, 1.0);
+            background: root.rpm-color;
+            border-radius: 4px * root.k;
+        }
+    }
+
+    HorizontalLayout {
+        alignment: center;
+        spacing: 8px * root.k;
+
+        Text {
+            text: "\{round(root.rpm)}";
+            font-size: 48px * root.k;
+            font-weight: 900;
+            color: root.rpm >= root.redline-rpm ? #ef4444 : #ffffff;
+            vertical-alignment: center;
+        }
+
+        Text {
+            text: "RPM";
+            font-size: 16px * root.k;
+            font-weight: 900;
+            color: root.rpm >= root.redline-rpm ? #ef4444 : #ffffff;
+            vertical-alignment: center;
+        }
+    }
+}
+
+// Row of shift lights: fills green -> amber -> red as RPM approaches shift
+component ShiftLights inherits VerticalLayout {
+    in property <float> k: 1.0;
+    in property <float> rpm;
+    in property <int> redline-rpm;
+    in property <int> shift-rpm;
+
+    property <int> count: 8;
+    property <float> start-rpm: root.shift-rpm * 0.6;
+
+    alignment: center;
+    spacing: 8px * root.k;
+
+    HorizontalLayout {
+        alignment: center;
+        spacing: 8px * root.k;
+
+        for i in root.count: Rectangle {
+            property <bool> lit: root.rpm >= root.start-rpm
+                + (root.shift-rpm - root.start-rpm) * i / (root.count - 1);
+            property <color> on-color: root.rpm >= root.redline-rpm ? #ef4444
+                : i < 4 ? #4ade80
+                : i < 6 ? #fbbf24
+                : #ef4444;
+
+            width: 28px * root.k;
+            height: 28px * root.k;
+            border-radius: self.width / 2;
+            background: self.lit ? self.on-color : #2e3748;
+        }
+    }
+
+    HorizontalLayout {
+        alignment: center;
+        spacing: 8px * root.k;
+
+        Text {
+            text: "\{round(root.rpm)}";
+            font-size: 32px * root.k;
+            font-weight: 900;
+            color: #ffffff;
+            vertical-alignment: center;
+        }
+
+        Text {
+            text: "RPM";
+            font-size: 14px * root.k;
+            font-weight: 900;
+            color: #8b95a5;
+            vertical-alignment: center;
+        }
+    }
+}
+
+// 270-degree arc with speed in the middle
+component ArcGauge inherits Rectangle {
+    in property <float> rpm;
+    in property <float> speed;
+    in property <string> unit-text;
+    in property <float> max-rpm;
+    in property <int> redline-rpm;
+    in property <int> shift-rpm;
+    property <length> gauge-size: min(self.width, self.height) * 0.95;
+    property <float> k: root.gauge-size / 190px;
+
+    property <float> frac: min(max(root.rpm / root.max-rpm, 0.0), 1.0);
+    property <float> angle: 135 + 270 * root.frac;   // degrees, SVG-style (clockwise)
+    property <float> end-x: 100 + 90 * cos(root.angle * 1deg);
+    property <float> end-y: 100 + 90 * sin(root.angle * 1deg);
+    property <color> rpm-color: root.rpm >= root.redline-rpm ? #ef4444
+        : root.rpm >= root.shift-rpm ? #fbbf24
+        : #00ffcc;
+
+    // Track
+    Path {
+        width: root.gauge-size;
+        height: root.gauge-size;
+        stroke-width: 12px * root.k;
+        x: (parent.width - self.width) / 2;
+        y: (parent.height - self.height) / 2;
+        viewbox-width: 200;
+        viewbox-height: 200;
+        commands: "M 36.36 163.64 A 90 90 0 1 1 163.64 163.64";
+        stroke: #2e3748;
+        stroke-line-cap: round;
+        fill: transparent;
+    }
+
+    // Progress
+    Path {
+        width: root.gauge-size;
+        height: root.gauge-size;
+        stroke-width: 12px * root.k;
+        x: (parent.width - self.width) / 2;
+        y: (parent.height - self.height) / 2;
+        viewbox-width: 200;
+        viewbox-height: 200;
+        commands: "M 36.36 163.64 A 90 90 0 \{root.frac * 270 > 180 ? 1 : 0} 1 \{root.end-x} \{root.end-y}";
+        stroke: root.rpm-color;
+        stroke-line-cap: round;
+        fill: transparent;
+    }
+
+    VerticalLayout {
+        alignment: center;
+        spacing: 0px;
+
+        // Speed
+        Text {
+            text: "\{round(root.speed)}";
+            font-size: 64px * root.k;
+            font-weight: 900;
+            color: #ffffff;
+            horizontal-alignment: center;
+        }
+
+        // Units
+        Text {
+            text: root.unit-text;
+            font-size: 16px * root.k;
+            font-weight: 900;
+            color: #8b95a5;
+            horizontal-alignment: center;
+        }
+
+        // RPMs
+        Text {
+            text: "\{round(root.rpm)} RPM";
+            font-size: 14px * root.k;
+            font-weight: 900;
+            color: root.rpm-color;
+            horizontal-alignment: center;
+        }
+    }
+}
 
 export component Speedometer inherits Rectangle {
     in property <bool> obd-connected;
     in property <float> rpm;
     in property <float> speed;
     in property <int> speed-unit;
+    in property <int> redline-rpm;
+    in property <int> shift-rpm;
+    in property <int> gauge-style;   // 0 = Bar, 1 = Arc, 2 = Lights
 
-    VerticalLayout {
+    property <float> max-rpm: root.redline-rpm + 1000;
+    property <float> k: min(self.width / 300px, self.height / 224px);
+
+    if root.gauge-style == 1: ArcGauge {
+        rpm: root.rpm;
+        speed: root.speed;
+        unit-text: root.speed-unit == 0 ? "KPH" : "MPH";
+        max-rpm: root.max-rpm;
+        redline-rpm: root.redline-rpm;
+        shift-rpm: root.shift-rpm;
+    }
+
+    if root.gauge-style != 1: VerticalLayout {
         alignment: center;
+        spacing: 12px * root.k;
 
-        // Keep both displays together as one centered group
-        VerticalLayout {
+        HorizontalLayout {
             alignment: center;
-            spacing: 12px;
+            spacing: 8px * root.k;
 
-            // --- Speed Container ---
-            HorizontalLayout {
-                alignment: center;
-                spacing: 8px;
-
-                Text {
-                    text: "\{round(root.speed)}";
-                    font-size: 84px;
-                    font-weight: 900;
-                    color: #ffffff;
-                    vertical-alignment: center;
-                }
-
-                Text {
-                    text: root.speed-unit == 0 ? "KPH" : "MPH";
-                    font-size: 32px;
-                    font-weight: 900;
-                    color: #ffffff;
-                    vertical-alignment: center;
-                }
+            Text {
+                text: "\{round(root.speed)}";
+                font-size: 84px * root.k;
+                font-weight: 900;
+                color: #ffffff;
+                vertical-alignment: center;
             }
 
-            // --- RPM Container ---
-            VerticalLayout {
-                alignment: center;
-                spacing: 8px;
-
-                Rectangle {
-                    x: (parent.width - self.width) / 2;
-                    width: parent.width * 0.85;
-                    height: 32px;
-                    background: #2e3748;
-                    border-radius: 4px;
-
-                    Rectangle {
-                        x: 0;
-                        y: 0;
-                        height: parent.height;
-                        width: parent.width * (root.rpm / 8000.0);
-                        background: root.rpm > 6000.0 ? #ef4444 : #00ffcc;
-                        border-radius: 4px;
-                    }
-                }
-
-                HorizontalLayout {
-                    alignment: center;
-                    spacing: 8px;
-
-                    Text {
-                        text: "\{round(root.rpm)}";
-                        font-size: 48px;
-                        font-weight: 900;
-                        color: root.rpm > 6000.0 ? #ef4444 : #ffffff;
-                        vertical-alignment: center;
-                    }
-
-                    Text {
-                        text: "RPM";
-                        font-size: 16px;
-                        font-weight: 900;
-                        color: root.rpm > 6000.0 ? #ef4444 : #ffffff;
-                        vertical-alignment: center;
-                    }
-                }
+            Text {
+                text: root.speed-unit == 0 ? "KPH" : "MPH";
+                font-size: 32px * root.k;
+                font-weight: 900;
+                color: #ffffff;
+                vertical-alignment: center;
             }
+        }
+
+        if root.gauge-style == 0: BarGauge {
+            k: root.k;
+            rpm: root.rpm;
+            max-rpm: root.max-rpm;
+            redline-rpm: root.redline-rpm;
+            shift-rpm: root.shift-rpm;
+        }
+
+        if root.gauge-style == 2: ShiftLights {
+            k: root.k;
+            rpm: root.rpm;
+            redline-rpm: root.redline-rpm;
+            shift-rpm: root.shift-rpm;
         }
     }
 }
