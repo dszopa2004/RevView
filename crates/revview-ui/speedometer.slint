@@ -26,13 +26,13 @@ component BarGauge inherits VerticalLayout {
             height: parent.height;
             width: parent.width * min(root.rpm / root.max-rpm, 1.0);
             background: root.rpm-color;
-            border-radius: 4px;
+            border-radius: 4px * root.k;
         }
     }
 
     HorizontalLayout {
         alignment: center;
-        spacing: 8px;
+        spacing: 8px * root.k;
 
         Text {
             text: "\{round(root.rpm)}";
