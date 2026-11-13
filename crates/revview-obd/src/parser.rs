@@ -62,3 +62,7 @@ pub fn parse_throttle_position_response(response: &str) -> Option<f32> {
 
     Some((*bytes.first()? as f32 / 255.0) * 100.0)
 }
+
+pub fn parse_stored_codes_response(response: &str) {}
+pub fn parse_pending_codes_response(response: &str) {}
+pub fn parse_permanent_codes_response(response: &str) {}
