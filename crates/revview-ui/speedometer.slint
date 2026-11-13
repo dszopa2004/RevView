@@ -112,6 +112,8 @@ component ArcGauge inherits Rectangle {
     in property <float> max-rpm;
     in property <int> redline-rpm;
     in property <int> shift-rpm;
+    property <length> gauge-size: min(self.width, self.height) * 0.95;
+    property <float> k: root.gauge-size / 190px;
 
     property <float> frac: min(max(root.rpm / root.max-rpm, 0.0), 1.0);
     property <float> angle: 135 + 270 * root.frac;   // degrees, SVG-style (clockwise)
@@ -123,30 +125,30 @@ component ArcGauge inherits Rectangle {
 
     // Track
     Path {
-        width: 190px;
-        height: 190px;
+        width: root.gauge-size;
+        height: root.gauge-size;
+        stroke-width: 12px * root.k;
         x: (parent.width - self.width) / 2;
         y: (parent.height - self.height) / 2;
         viewbox-width: 200;
         viewbox-height: 200;
         commands: "M 36.36 163.64 A 90 90 0 1 1 163.64 163.64";
         stroke: #2e3748;
-        stroke-width: 12px;
         stroke-line-cap: round;
         fill: transparent;
     }
 
     // Progress
     Path {
-        width: 190px;
-        height: 190px;
+        width: root.gauge-size;
+        height: root.gauge-size;
+        stroke-width: 12px * root.k;
         x: (parent.width - self.width) / 2;
         y: (parent.height - self.height) / 2;
         viewbox-width: 200;
         viewbox-height: 200;
         commands: "M 36.36 163.64 A 90 90 0 \{root.frac * 270 > 180 ? 1 : 0} 1 \{root.end-x} \{root.end-y}";
         stroke: root.rpm-color;
-        stroke-width: 12px;
         stroke-line-cap: round;
         fill: transparent;
     }
@@ -155,25 +157,28 @@ component ArcGauge inherits Rectangle {
         alignment: center;
         spacing: 0px;
 
+        // Speed
         Text {
             text: "\{round(root.speed)}";
-            font-size: 64px;
+            font-size: 64px * root.k;
             font-weight: 900;
             color: #ffffff;
             horizontal-alignment: center;
         }
 
+        // Units
         Text {
             text: root.unit-text;
-            font-size: 16px;
+            font-size: 16px * root.k;
             font-weight: 900;
             color: #8b95a5;
             horizontal-alignment: center;
         }
 
+        // RPMs
         Text {
             text: "\{round(root.rpm)} RPM";
-            font-size: 14px;
+            font-size: 14px * root.k;
             font-weight: 900;
             color: root.rpm-color;
             horizontal-alignment: center;

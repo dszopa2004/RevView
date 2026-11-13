@@ -7,6 +7,7 @@ import { Settings } from "settings.slint";
 export component Dashboard inherits Window {
     preferred-width: 480px;
     preferred-height: 320px;
+    default-font-size: min(self.width / 480px, self.height / 320px) * 10px;
 
     min-width: 480px;
     min-height: 320px;
