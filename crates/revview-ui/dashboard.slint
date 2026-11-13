@@ -3,7 +3,7 @@ import { HorizontalBox, VerticalBox, Button } from "std-widgets.slint";
 import { Telemetry } from "telemetry.slint";
 import { Speedometer } from "speedometer.slint";
 import { Settings } from "settings.slint";
-import { Diagnostics } from "diagnostics.slint";
+import { Diagnostics, DiagnosticEntry } from "diagnostics.slint";
 
 export component Dashboard inherits Window {
     preferred-width: 480px;
@@ -17,6 +17,7 @@ export component Dashboard inherits Window {
     background: #171a20;
 
     callback settings-changed();
+    callback run-diagnostics();
 
     // OBD-II Properties
     in-out property <bool> obd-connected: false;
@@ -34,6 +35,9 @@ export component Dashboard inherits Window {
 
     in-out property <int> speed-unit: 0; // 0 = KPH, 1 = MPH
     in-out property <int> temp-unit: 0; // 0 = C, 1 = F
+
+    in-out property <int> diag-state: 0;   // 0 idle, 1 running, 2 done, 3 failed
+    in property <[DiagnosticEntry]> diag-entries;
 
     in-out property <bool> show-settings: false;
     out property <int> max-view: 2;
@@ -107,7 +111,11 @@ export component Dashboard inherits Window {
                     temp-unit: root.temp-unit;
                 }
 
-                if root.current-view == 2: Diagnostics { }
+                if root.current-view == 2: Diagnostics {
+                    state <=> root.diag-state;
+                    entries: root.diag-entries;
+                    run-requested => { root.run-diagnostics(); }
+                }
             }
 
             // --- Right Navigation ---
