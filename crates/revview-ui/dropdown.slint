@@ -6,8 +6,8 @@ export component Dropdown inherits Rectangle {
     callback selected(int);
 
     height: 36px;
-    background: #171a20;
-    border-color: #354152;
+    background: Theme.window-bg;
+    border-color: Theme.card-border;
     border-width: 1px;
     border-radius: 8px;
 
@@ -16,7 +16,7 @@ export component Dropdown inherits Rectangle {
         text: root.model[root.current-index];
         font-size: 15px;
         font-weight: 800;
-        color: #00ffcc;
+        color: Theme.accent;
         vertical-alignment: center;
     }
 
@@ -24,7 +24,7 @@ export component Dropdown inherits Rectangle {
         x: parent.width - self.width - 10px;
         text: "▾";
         font-size: 14px;
-        color: #8b95a5;
+        color: Theme.text-dim;
         vertical-alignment: center;
     }
 
@@ -40,8 +40,8 @@ export component Dropdown inherits Rectangle {
         close-policy: close-on-click-outside;
 
         Rectangle {
-            background: #202630;
-            border-color: #354152;
+            background: Theme.card-bg;
+            border-color: Theme.card-border;
             border-width: 1px;
             border-radius: 8px;
 
@@ -51,15 +51,15 @@ export component Dropdown inherits Rectangle {
                 for item[i] in root.model: Rectangle {
                     height: 36px;
                     border-radius: 6px;
-                    background: item-touch.pressed ? #45475a
-                        : i == root.current-index ? #354152
+                    background: item-touch.pressed ? Theme.button-pressed
+                        : i == root.current-index ? Theme.card-border
                         : transparent;
 
                     Text {
                         text: item;
                         font-size: 15px;
                         font-weight: 800;
-                        color: i == root.current-index ? #00ffcc : #ffffff;
+                        color: i == root.current-index ? Theme.accent : Theme.text;
                         horizontal-alignment: center;
                         vertical-alignment: center;
                     }
