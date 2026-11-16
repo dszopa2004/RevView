@@ -7,9 +7,9 @@ component BarGauge inherits VerticalLayout {
     in property <int> shift-rpm;
     in property <float> k: 1.0;
 
-    property <color> rpm-color: root.rpm >= root.redline-rpm ? #ef4444
-        : root.rpm >= root.shift-rpm ? #fbbf24
-        : #00ffcc;
+    property <color> rpm-color: root.rpm >= root.redline-rpm ? Theme.danger
+        : root.rpm >= root.shift-rpm ? Theme.warn
+        : Theme.accent;
 
     alignment: center;
     spacing: 8px * root.k;
@@ -18,7 +18,7 @@ component BarGauge inherits VerticalLayout {
         x: (parent.width - self.width) / 2;
         width: parent.width * 0.85;
         height: 32px * root.k;
-        background: #2e3748;
+        background: Theme.track;
         border-radius: 4px * root.k;
 
         Rectangle {
@@ -39,7 +39,7 @@ component BarGauge inherits VerticalLayout {
             text: "\{round(root.rpm)}";
             font-size: 48px * root.k;
             font-weight: 900;
-            color: root.rpm >= root.redline-rpm ? #ef4444 : #ffffff;
+            color: root.rpm >= root.redline-rpm ? Theme.danger : Theme.text;
             vertical-alignment: center;
         }
 
@@ -47,7 +47,7 @@ component BarGauge inherits VerticalLayout {
             text: "RPM";
             font-size: 16px * root.k;
             font-weight: 900;
-            color: root.rpm >= root.redline-rpm ? #ef4444 : #ffffff;
+            color: root.rpm >= root.redline-rpm ? Theme.danger : Theme.text;
             vertical-alignment: center;
         }
     }
@@ -73,15 +73,15 @@ component ShiftLights inherits VerticalLayout {
         for i in root.count: Rectangle {
             property <bool> lit: root.rpm >= root.start-rpm
                 + (root.shift-rpm - root.start-rpm) * i / (root.count - 1);
-            property <color> on-color: root.rpm >= root.redline-rpm ? #ef4444
-                : i < 4 ? #4ade80
-                : i < 6 ? #fbbf24
-                : #ef4444;
+            property <color> on-color: root.rpm >= root.redline-rpm ? Theme.danger
+                : i < 4 ? Theme.ok
+                : i < 6 ? Theme.warn
+                : Theme.danger;
 
             width: 28px * root.k;
             height: 28px * root.k;
             border-radius: self.width / 2;
-            background: self.lit ? self.on-color : #2e3748;
+            background: self.lit ? self.on-color : Theme.track;
         }
     }
 
@@ -93,7 +93,7 @@ component ShiftLights inherits VerticalLayout {
             text: "\{round(root.rpm)}";
             font-size: 32px * root.k;
             font-weight: 900;
-            color: #ffffff;
+            color: Theme.text;
             vertical-alignment: center;
         }
 
@@ -101,7 +101,7 @@ component ShiftLights inherits VerticalLayout {
             text: "RPM";
             font-size: 14px * root.k;
             font-weight: 900;
-            color: #8b95a5;
+            color: Theme.text-dim;
             vertical-alignment: center;
         }
     }
@@ -122,9 +122,9 @@ component ArcGauge inherits Rectangle {
     property <float> angle: 135 + 270 * root.frac;   // degrees, SVG-style (clockwise)
     property <float> end-x: 100 + 90 * cos(root.angle * 1deg);
     property <float> end-y: 100 + 90 * sin(root.angle * 1deg);
-    property <color> rpm-color: root.rpm >= root.redline-rpm ? #ef4444
-        : root.rpm >= root.shift-rpm ? #fbbf24
-        : #00ffcc;
+    property <color> rpm-color: root.rpm >= root.redline-rpm ? Theme.danger
+        : root.rpm >= root.shift-rpm ? Theme.warn
+        : Theme.accent;
 
     // Track
     Path {
@@ -136,7 +136,7 @@ component ArcGauge inherits Rectangle {
         viewbox-width: 200;
         viewbox-height: 200;
         commands: "M 36.36 163.64 A 90 90 0 1 1 163.64 163.64";
-        stroke: #2e3748;
+        stroke: Theme.track;
         stroke-line-cap: round;
         fill: transparent;
     }
@@ -165,7 +165,7 @@ component ArcGauge inherits Rectangle {
             text: "\{round(root.speed)}";
             font-size: 64px * root.k;
             font-weight: 900;
-            color: #ffffff;
+            color: Theme.text;
             horizontal-alignment: center;
         }
 
@@ -174,7 +174,7 @@ component ArcGauge inherits Rectangle {
             text: root.unit-text;
             font-size: 16px * root.k;
             font-weight: 900;
-            color: #8b95a5;
+            color: Theme.text-dim;
             horizontal-alignment: center;
         }
 
@@ -222,7 +222,7 @@ export component Speedometer inherits Rectangle {
                 text: "\{round(root.speed)}";
                 font-size: 84px * root.k;
                 font-weight: 900;
-                color: #ffffff;
+                color: Theme.text;
                 vertical-alignment: center;
             }
 
@@ -230,7 +230,7 @@ export component Speedometer inherits Rectangle {
                 text: root.speed-unit == 0 ? "KPH" : "MPH";
                 font-size: 32px * root.k;
                 font-weight: 900;
-                color: #ffffff;
+                color: Theme.text;
                 vertical-alignment: center;
             }
         }
