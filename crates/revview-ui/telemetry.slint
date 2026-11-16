@@ -9,7 +9,7 @@ export component Telemetry inherits Rectangle {
     in property <int> speed-unit;
     in property <int> temp-unit;
 
-    background: #1e1e2e;
+    background: Theme.panel-bg;
 
     GridLayout {
         padding: 10px;
@@ -18,7 +18,7 @@ export component Telemetry inherits Rectangle {
         // Equal-sized columns and rows
         Row {
             Rectangle {
-                background: #30394a;
+                background: Theme.button-bg;
                 border-radius: 10px;
 
                 VerticalLayout {
@@ -29,7 +29,7 @@ export component Telemetry inherits Rectangle {
                         text: "COOLANT TEMP";
                         font-size: 16px;
                         font-weight: 800;
-                        color: #a6adc8;
+                        color: Theme.text-dim;
                         horizontal-alignment: center;
                     }
 
@@ -37,14 +37,14 @@ export component Telemetry inherits Rectangle {
                         text: "\{round(root.coolant-temp)} \{root.temp-unit == 0 ? "°C" : "°F"}";
                         font-size: 36px;
                         font-weight: 900;
-                        color: #ffffff;
+                        color: Theme.text;
                         horizontal-alignment: center;
                     }
                 }
             }
 
             Rectangle {
-                background: #30394a;
+                background: Theme.button-bg;
                 border-radius: 10px;
 
                 VerticalLayout {
@@ -55,7 +55,7 @@ export component Telemetry inherits Rectangle {
                         text: "INTAKE TEMP";
                         font-size: 16px;
                         font-weight: 800;
-                        color: #a6adc8;
+                        color: Theme.text-dim;
                         horizontal-alignment: center;
                     }
 
@@ -63,7 +63,7 @@ export component Telemetry inherits Rectangle {
                         text: "\{round(root.intake-temp)} \{root.temp-unit == 0 ? "°C" : "°F"}";
                         font-size: 36px;
                         font-weight: 900;
-                        color: #ffffff;
+                        color: Theme.text;
                         horizontal-alignment: center;
                     }
                 }
@@ -72,7 +72,7 @@ export component Telemetry inherits Rectangle {
 
         Row {
             Rectangle {
-                background: #30394a;
+                background: Theme.button-bg;
                 border-radius: 10px;
 
                 VerticalLayout {
@@ -83,7 +83,7 @@ export component Telemetry inherits Rectangle {
                         text: "THROTTLE POSITION";
                         font-size: 14px;
                         font-weight: 800;
-                        color: #a6adc8;
+                        color: Theme.text-dim;
                         horizontal-alignment: center;
                     }
 
@@ -91,14 +91,14 @@ export component Telemetry inherits Rectangle {
                         text: "\{round(root.throttle-position)}%";
                         font-size: 30px;
                         font-weight: 900;
-                        color: #00ffcc;
+                        color: Theme.accent;
                         horizontal-alignment: center;
                     }
                 }
             }
 
             Rectangle {
-                background: #30394a;
+                background: Theme.button-bg;
                 border-radius: 10px;
 
                 VerticalLayout {
@@ -109,7 +109,7 @@ export component Telemetry inherits Rectangle {
                         text: "VEHICLE DATA";
                         font-size: 16px;
                         font-weight: 800;
-                        color: #a6adc8;
+                        color: Theme.text-dim;
                         horizontal-alignment: center;
                     }
 
@@ -117,7 +117,7 @@ export component Telemetry inherits Rectangle {
                         text: "\{round(root.speed)} \{root.speed-unit == 0 ? "KPH" : "MPH"}";
                         font-size: 32px;
                         font-weight: 900;
-                        color: #ffffff;
+                        color: Theme.text;
                         horizontal-alignment: center;
                     }
 
@@ -125,7 +125,7 @@ export component Telemetry inherits Rectangle {
                         text: "\{round(root.rpm)} RPM";
                         font-size: 24px;
                         font-weight: 800;
-                        color: #ffffff;
+                        color: Theme.text;
                         horizontal-alignment: center;
                     }
                 }
