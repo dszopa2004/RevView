@@ -1,0 +1,110 @@
+export struct Palette {
+    window-bg: color,     // behind everything
+    card-bg: color,       // main card
+    card-border: color,   // card outline, selected segments
+    panel-bg: color,      // inner center panel
+    button-bg: color,
+    button-pressed: color,
+    track: color,         // empty gauge track, unlit LEDs
+    text: color,
+    text-dim: color,
+    accent: color,        // main highlight (was #00ffcc)
+    ok: color,            // was #4ade80
+    warn: color,          // was #fbbf24
+    danger: color,        // was #ef4444
+    info: color,          // was #a78bfa
+}
+
+export global Theme {
+    in-out property <int> current: 0;
+    out property <[string]> names: ["Teal", "Amber", "Ice", "Light"];
+
+    property <[Palette]> palettes: [
+        // 0: Teal (your current look)
+        {
+            window-bg: #171a20,
+            card-bg: #202630,
+            card-border: #354152,
+            panel-bg: #1e1e2e,
+            button-bg: #2a2b36,
+            button-pressed: #45475a,
+            track: #2e3748,
+            text: #ffffff,
+            text-dim: #8b95a5,
+            accent: #00ffcc,
+            ok: #4ade80,
+            warn: #fbbf24,
+            danger: #ef4444,
+            info: #a78bfa,
+        },
+        // 1: Amber
+        {
+            window-bg: #17140f,
+            card-bg: #211c14,
+            card-border: #4a3b22,
+            panel-bg: #1c1810,
+            button-bg: #2b2418,
+            button-pressed: #453a24,
+            track: #3a2f1c,
+            text: #fff7e6,
+            text-dim: #a8957a,
+            accent: #ffb000,
+            ok: #84cc16,
+            warn: #fb923c,
+            danger: #ef4444,
+            info: #c084fc,
+        },
+        // 2: Ice
+        {
+            window-bg: #10151c,
+            card-bg: #17202b,
+            card-border: #2c4258,
+            panel-bg: #131b25,
+            button-bg: #1d2a38,
+            button-pressed: #2f4358,
+            track: #223244,
+            text: #eef6ff,
+            text-dim: #8aa0b5,
+            accent: #5eb8ff,
+            ok: #4ade80,
+            warn: #fbbf24,
+            danger: #f87171,
+            info: #a78bfa,
+        },
+        // 3: Light
+        {
+            window-bg: #e8ecf1,
+            card-bg: #f6f8fa,
+            card-border: #c5ced8,
+            panel-bg: #ffffff,
+            button-bg: #e3e8ee,
+            button-pressed: #cfd7e0,
+            track: #d5dce4,
+            text: #14181f,
+            text-dim: #5b6674,
+            accent: #0891b2,
+            ok: #16a34a,
+            warn: #d97706,
+            danger: #dc2626,
+            info: #7c3aed,
+        },
+    ];
+
+    // Clamp so a bad saved value can't index out of range
+    property <int> idx: max(0, min(root.current, root.palettes.length - 1));
+
+    out property <color> window-bg: root.palettes[root.idx].window-bg;
+    out property <color> card-bg: root.palettes[root.idx].card-bg;
+    out property <color> card-border: root.palettes[root.idx].card-border;
+    out property <color> panel-bg: root.palettes[root.idx].panel-bg;
+    out property <color> button-bg: root.palettes[root.idx].button-bg;
+    out property <color> button-pressed: root.palettes[root.idx].button-pressed;
+    out property <color> track: root.palettes[root.idx].track;
+    out property <color> text: root.palettes[root.idx].text;
+    out property <color> text-dim: root.palettes[root.idx].text-dim;
+    out property <color> accent: root.palettes[root.idx].accent;
+    out property <color> ok: root.palettes[root.idx].ok;
+    out property <color> warn: root.palettes[root.idx].warn;
+    out property <color> danger: root.palettes[root.idx].danger;
+    out property <color> info: root.palettes[root.idx].info;
+}
