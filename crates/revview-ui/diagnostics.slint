@@ -47,29 +47,13 @@ component IndeterminateBar inherits Rectangle {
 export component Diagnostics inherits Rectangle {
     // 0 = idle, 1 = running, 2 = done, 3 = failed
     in-out property <int> state: 0;
-    in property <[DiagnosticEntry]> entries: [
-        // TEMPORARY sample data for previewing. Delete once the backend fills this in.
-        { code: "P0133", kind: "Stored" },
-        { code: "P0420", kind: "Stored" },
-        { code: "P0301", kind: "Pending" },
-        { code: "P0171", kind: "Pending" },
-        { code: "U0100", kind: "Permanent" },
-        { code: "P0442", kind: "Permanent" },
-    ];
+    in property <[DiagnosticEntry]> entries;
     callback run-requested();
 
     // Same scaling idea as the gauges: 300x224 is the design size
     property <float> k: min(self.width / 300px, self.height / 224px);
     property <length> row-height: 40px * root.k;
     property <length> row-spacing: 6px * root.k;
-
-    // TEMPORARY: fakes a 3 second scan so you can preview the flow.
-    // Delete once the backend drives `state`.
-    Timer {
-        interval: 3s;
-        running: root.state == 1;
-        triggered => { root.state = 2; }
-    }
 
     // --- Idle / failed: centered button ---
     if root.state == 0 || root.state == 3: VerticalLayout {

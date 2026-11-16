@@ -18,6 +18,10 @@ use revview_obd::{
     scheduler::PollingScheduler,
 };
 
+use revview_core::diagnostics::{CodeKind, CodeStatus, DiagnosticReport};
+use revview_obd::commands::codes_command;
+use std::sync::mpsc;
+
 slint::include_modules!();
 
 fn main() -> Result<(), slint::PlatformError> {
@@ -57,6 +61,8 @@ fn main() -> Result<(), slint::PlatformError> {
     // Create a weak handle to safely pass across thread boundaries
     let app_weak = app.as_weak();
 
+    let (diag_tx, diag_rx) = mpsc::channel::<()>();
+
     app.on_settings_changed({
         let storage = storage.clone();
         let app_weak = app_weak.clone();
@@ -91,6 +97,18 @@ fn main() -> Result<(), slint::PlatformError> {
         }
     });
 
+    app.on_run_diagnostics({
+        let app_weak = app_weak.clone();
+        move || {
+            // If the OBD thread has exited (no adapter), nobody is listening.
+            if diag_tx.send(()).is_err() {
+                if let Some(ui) = app_weak.upgrade() {
+                    ui.set_diag_state(3);
+                }
+            }
+        }
+    });
+
     // Spawn a background thread to handle the blocking OBD loop
     thread::spawn(move || {
         let mut telemetry = VehicleTelemetry::default();
@@ -112,6 +130,10 @@ fn main() -> Result<(), slint::PlatformError> {
                     update_ui(&app_weak, move |ui| {
                         ui.set_obd_initialization_error(error_msg.into());
                     });
+
+                    update_ui(&app_weak, move |ui| {
+                        ui.set_obd_initialized(true);
+                    });
                     return;
                 }
 
@@ -123,9 +145,15 @@ fn main() -> Result<(), slint::PlatformError> {
 
                 // Infinite loop to continuously update telemetry while the app runs
 
+                let mut report = DiagnosticReport::default(); // fresh each connection, never saved
                 let mut scheduler = PollingScheduler::new();
 
                 loop {
+                    if diag_rx.try_recv().is_ok() {
+                        run_diagnostics(&mut *port, &mut report, &app_weak);
+                        continue;
+                    }
+
                     let now = Instant::now();
 
                     if let Some(kind) = scheduler.next_due(now) {
@@ -239,4 +267,70 @@ fn process_telemetry(
             telemetry.throttle_position = parser::parse_throttle_position_response(response);
         }
     }
+}
+
+fn run_diagnostics(
+    port: &mut dyn serialport::SerialPort,
+    report: &mut DiagnosticReport,
+    app_weak: &slint::Weak<Dashboard>,
+) {
+    report.clear();
+
+    for kind in [CodeKind::Stored, CodeKind::Pending, CodeKind::Permanent] {
+        report.set(kind, CodeStatus::Requesting);
+
+        let status = match request_telemetry(port, codes_command(kind)) {
+            Ok(response) => {
+                let parsed = match kind {
+                    CodeKind::Stored => parser::parse_stored_codes_response(&response),
+                    CodeKind::Pending => parser::parse_pending_codes_response(&response),
+                    CodeKind::Permanent => parser::parse_permanent_codes_response(&response),
+                };
+                match parsed {
+                    Some(codes) => CodeStatus::Loaded(codes),
+                    None => {
+                        eprintln!("{:?} codes: unparseable response: {:?}", kind, response);
+                        CodeStatus::Failed
+                    }
+                }
+            }
+            Err(e) => {
+                eprintln!("{:?} codes request failed: {}", kind, e);
+                CodeStatus::Failed
+            }
+        };
+
+        report.set(kind, status);
+    }
+
+    // Done if at least one kind loaded. Older cars often don't support
+    // mode 0A, and that shouldn't fail the whole scan.
+    let any_loaded = [&report.stored, &report.pending, &report.permanent]
+        .iter()
+        .any(|s| matches!(s, CodeStatus::Loaded(_)));
+
+    let mut entries: Vec<(String, &'static str)> = Vec::new();
+    for (status, label) in [
+        (&report.stored, "Stored"),
+        (&report.pending, "Pending"),
+        (&report.permanent, "Permanent"),
+    ] {
+        if let CodeStatus::Loaded(codes) = status {
+            entries.extend(codes.iter().map(|c| (c.0.clone(), label)));
+        }
+    }
+
+    update_ui(app_weak, move |ui| {
+        let model: Vec<DiagnosticEntry> = entries
+            .into_iter()
+            .map(|(code, kind)| DiagnosticEntry {
+                code: code.into(),
+                kind: kind.into(),
+            })
+            .collect();
+
+        // Entries first, then state, so the list is never shown empty.
+        ui.set_diag_entries(slint::ModelRc::new(slint::VecModel::from(model)));
+        ui.set_diag_state(if any_loaded { 2 } else { 3 });
+    });
 }
