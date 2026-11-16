@@ -15,7 +15,7 @@ export component Dashboard inherits Window {
     min-height: 320px;
 
     maximized: true;
-    background: #171a20;
+    background: Theme.window-bg;
 
     callback settings-changed();
     callback run-diagnostics();
@@ -52,8 +52,8 @@ export component Dashboard inherits Window {
         width: parent.width - 2 * root.margin;
         height: parent.height - 2 * root.margin;
 
-        background: #202630;
-        border-color: #354152;
+        background: Theme.card-bg;
+        border-color: Theme.card-border;
         border-width: 1px;
         border-radius: 16px;
 
@@ -65,13 +65,13 @@ export component Dashboard inherits Window {
             Rectangle {
                 horizontal-stretch: 0.35;
                 min-width: 28px;
-                background: left-touch.pressed ? #45475a : #2a2b36;
+                background: left-touch.pressed ? Theme.button-pressed : Theme.button-bg;
                 border-radius: 8px;
 
                 Text {
                     text: "<";
                     font-size: 24px;
-                    color: white;
+                    color: Theme.text;
                     horizontal-alignment: center;
                     vertical-alignment: center;
                 }
@@ -89,7 +89,7 @@ export component Dashboard inherits Window {
             // --- Center Dashboard ---
             Rectangle {
                 horizontal-stretch: 9.3;
-                background: #1e1e2e;
+                background: Theme.panel-bg;
                 border-radius: 10px;
 
                 if root.current-view == 0: Speedometer {
@@ -123,13 +123,13 @@ export component Dashboard inherits Window {
             Rectangle {
                 horizontal-stretch: 0.35;
                 min-width: 28px;
-                background: right-touch.pressed ? #45475a : #2a2b36;
+                background: right-touch.pressed ? Theme.button-pressed : Theme.button-bg;
                 border-radius: 8px;
 
                 Text {
                     text: ">";
                     font-size: 24px;
-                    color: white;
+                    color: Theme.text;
                     horizontal-alignment: center;
                     vertical-alignment: center;
                 }
@@ -151,7 +151,7 @@ export component Dashboard inherits Window {
         text: "--- RevView ---";
         font-size: 12px;
         font-weight: 800;
-        color: #00ffcc;
+        color: Theme.accent;
         horizontal-alignment: center;
 
         x: 0px;
@@ -164,8 +164,8 @@ export component Dashboard inherits Window {
         y: root.margin;
         width: parent.width - 2 * root.margin;
         height: parent.height - 2 * root.margin;
-        background: #202630;
-        border-color: #354152;
+        background: Theme.card-bg;
+        border-color: Theme.card-border;
         border-width: 1px;
         border-radius: 16px;
 
@@ -197,14 +197,14 @@ if !root.obd-initialized && !root.show-settings: Rectangle {
             x: 8px;
             y: 8px;
             border-radius: 6px;
-            background: gear-touch.pressed ? #45475a : #2a2b36;
-            border-color: #354152;
+            background: gear-touch.pressed ? Theme.button-pressed : Theme.button-bg;
+            border-color: Theme.card-border;
             border-width: 1px;
 
             Text {
                 text: "⚙";
                 font-size: 12px;
-                color: #8b95a5;
+                color: Theme.text-dim;
                 horizontal-alignment: center;
                 vertical-alignment: center;
             }
@@ -222,8 +222,8 @@ if !root.obd-initialized && !root.show-settings: Rectangle {
         width: parent.width - 2 * root.margin;
         height: parent.height - 2 * root.margin;
 
-        background: #202630;
-        border-color: #354152;
+        background: Theme.card-bg;
+        border-color: Theme.card-border;
         border-width: 1px;
         border-radius: 16px;
 
@@ -237,7 +237,7 @@ if !root.obd-initialized && !root.show-settings: Rectangle {
                 Text {
                     text: "RevView Dashboard";
                     font-size: 36px;
-                    color: #4ade80;
+                    color: Theme.ok;
                     horizontal-alignment: center;
                 }
 
@@ -249,7 +249,7 @@ if !root.obd-initialized && !root.show-settings: Rectangle {
                             ? "OBD-II Connected"
                             : "OBD-II Disconnected";
                         font-size: 28px;
-                        color: #4ade80;
+                        color: Theme.ok;
                         horizontal-alignment: center;
                     }
 
@@ -258,7 +258,7 @@ if !root.obd-initialized && !root.show-settings: Rectangle {
                             ? ""
                             : "Make sure your OBD-II adapter is plugged in.";
                         font-size: 12px;
-                        color: #4ade80;
+                        color: Theme.ok;
                         horizontal-alignment: center;
                     }
                 }
@@ -271,14 +271,14 @@ if !root.obd-initialized && !root.show-settings: Rectangle {
                             ? "OBD-II Initialized"
                             : "OBD-II Uninitialized";
                         font-size: 28px;
-                        color: #4ade80;
+                        color: Theme.ok;
                         horizontal-alignment: center;
                     }
 
                     Text {
                         text: root.obd-initialization-error;
                         font-size: 12px;
-                        color: #4ade80;
+                        color: Theme.ok;
                         horizontal-alignment: center;
                     }
                 }
