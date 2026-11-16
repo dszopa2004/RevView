@@ -11,7 +11,7 @@ component SettingCell inherits VerticalLayout {
         text: root.label;
         font-size: 14px;
         font-weight: 800;
-        color: #ffffff;
+        color: Theme.text;
     }
 
     @children
@@ -25,8 +25,8 @@ component Segmented inherits Rectangle {
     callback changed();
 
     height: 36px;
-    background: #171a20;
-    border-color: #354152;
+    background: Theme.window-bg;
+    border-color: Theme.card-border;
     border-width: 1px;
     border-radius: 8px;
 
@@ -35,12 +35,12 @@ component Segmented inherits Rectangle {
 
         Rectangle {
             border-radius: 6px;
-            background: root.value == 0 ? #354152 : transparent;
+            background: root.value == 0 ? Theme.card-border : transparent;
             Text {
                 text: root.left-text;
                 font-size: 15px;
                 font-weight: 800;
-                color: root.value == 0 ? #00ffcc : #8b95a5;
+                color: root.value == 0 ? Theme.accent : Theme.text-dim;
                 horizontal-alignment: center;
                 vertical-alignment: center;
             }
@@ -52,12 +52,12 @@ component Segmented inherits Rectangle {
 
         Rectangle {
             border-radius: 6px;
-            background: root.value == 1 ? #354152 : transparent;
+            background: root.value == 1 ? Theme.card-border : transparent;
             Text {
                 text: root.right-text;
                 font-size: 15px;
                 font-weight: 800;
-                color: root.value == 1 ? #00ffcc : #8b95a5;
+                color: root.value == 1 ? Theme.accent : Theme.text-dim;
                 horizontal-alignment: center;
                 vertical-alignment: center;
             }
@@ -169,15 +169,15 @@ export component Settings inherits Rectangle {
                 width: 100px;
                 height: 36px;
                 border-radius: 8px;
-                background: back-touch.pressed ? #45475a : #2a2b36;
-                border-color: #354152;
+                background: back-touch.pressed ? Theme.button-pressed : Theme.button-bg;
+                border-color: Theme.card-border;
                 border-width: 1px;
 
                 Text {
                     text: "Back";
                     font-size: 16px;
                     font-weight: 800;
-                    color: #00ffcc;
+                    color: Theme.accent;
                     horizontal-alignment: center;
                     vertical-alignment: center;
                 }
