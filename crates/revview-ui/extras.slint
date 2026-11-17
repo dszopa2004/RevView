@@ -12,7 +12,7 @@ export component Extras inherits Rectangle {
     background: Theme.panel-bg;
 
     Flickable {
-        viewport-height: root.readings.length * 46px + 20px;
+        content-height: root.readings.length * 46px + 20px;
 
         for r[i] in root.readings: Rectangle {
             x: 10px;

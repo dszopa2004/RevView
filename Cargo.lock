@@ -3788,6 +3788,7 @@ dependencies = [
  "slint",
  "slint-build",
  "toml 1.2.1+spec-1.1.0",
+ "vehicle",
 ]
 
 [[package]]
@@ -4874,6 +4875,15 @@ dependencies = [
  "js-sys",
  "serde_core",
  "wasm-bindgen",
+]
+
+[[package]]
+name = "vehicle"
+version = "0.1.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "53ecac91e693f5901282ea6c2fee4a087c360c47bf9376358c95f4d748d59dcc"
+dependencies = [
+ "regex",
 ]
 
 [[package]]
