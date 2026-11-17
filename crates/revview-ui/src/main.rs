@@ -57,6 +57,7 @@ fn main() -> Result<(), slint::PlatformError> {
     app.set_redline_rpm(settings.redline_rpm.clamp(REDLINE_MIN, REDLINE_MAX) as i32);
     app.set_shift_rpm(settings.shift_rpm.clamp(REDLINE_MIN, REDLINE_MAX) as i32);
     app.set_gauge_style(settings.gauge_style as i32);
+    app.set_theme(settings.theme as i32);
 
     // Create a weak handle to safely pass across thread boundaries
     let app_weak = app.as_weak();
@@ -89,6 +90,7 @@ fn main() -> Result<(), slint::PlatformError> {
                 redline_rpm: (ui.get_redline_rpm().max(0) as u32).clamp(REDLINE_MIN, REDLINE_MAX),
                 shift_rpm: (ui.get_shift_rpm().max(0) as u32).clamp(REDLINE_MIN, REDLINE_MAX),
                 gauge_style: (ui.get_gauge_style().max(0) as u32),
+                theme: ui.get_theme().max(0) as u32,
             };
 
             if let Err(e) = storage.save(&settings) {
