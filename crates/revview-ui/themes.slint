@@ -17,7 +17,7 @@ export struct Palette {
 
 export global Theme {
     in-out property <int> current: 0;
-    out property <[string]> names: ["Teal", "Amber", "Ice", "Light"];
+    out property <[string]> names: ["Teal", "Amber", "Ice", "Light", "Dark Red"];
 
     property <[Palette]> palettes: [
         // 0: Teal (your current look)
@@ -87,6 +87,23 @@ export global Theme {
             warn: #d97706,
             danger: #dc2626,
             info: #7c3aed,
+        },
+        // Dark Red
+        {
+            window-bg: #140a0a,
+            card-bg: #1f1112,
+            card-border: #4a2226,
+            panel-bg: #1a0e0f,
+            button-bg: #2a1618,
+            button-pressed: #472327,
+            track: #3a1d20,
+            text: #ffe9e9,
+            text-dim: #a88486,
+            accent: #ff4d4d,
+            ok: #4ade80,
+            warn: #ffb020,
+            danger: #ff1a1a,
+            info: #f472b6,
         },
     ];
 
