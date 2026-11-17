@@ -74,6 +74,7 @@ component Segmented inherits Rectangle {
 export component Settings inherits Rectangle {
     callback settings-changed();
     callback back();
+    callback vehicle-changed(int);
 
     in-out property <int> speed-unit: 0;   // 0 = Kph, 1 = Mph
     in-out property <int> temp-unit: 0;    // 0 = C, 1 = F
@@ -84,9 +85,10 @@ export component Settings inherits Rectangle {
     // Scroll height = rows * cell-height + gaps. Update when you add a row.
     property <length> cell-height: 58px;
     property <length> grid-spacing: 12px;
-    property <int> row-count: 3;
+    property <int> row-count: 4;
 
-    background: transparent;
+    in-out property <int> vehicle-index: 0;
+    in property <[string]> vehicle-names;
 
     VerticalLayout {
         padding: 12px;
@@ -172,6 +174,16 @@ export component Settings inherits Rectangle {
                             model: Theme.names;
                             current-index <=> Theme.current;
                             selected(i) => { root.settings-changed(); }
+                        }
+                    }
+
+                    SettingCell {
+                        label: "Vehicle";
+
+                        Dropdown {
+                            model: root.vehicle-names;
+                            current-index <=> root.vehicle-index;
+                            selected(i) => { root.vehicle-changed(i); }
                         }
                     }
                 }

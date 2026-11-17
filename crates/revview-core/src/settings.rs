@@ -46,6 +46,7 @@ pub struct AppSettings {
     pub shift_rpm: u32,
     pub gauge_style: u32,
     pub theme: u32,
+    pub vehicle_id: String,
 }
 
 impl Default for AppSettings {
@@ -57,6 +58,7 @@ impl Default for AppSettings {
             shift_rpm: 6000,
             gauge_style: 0,
             theme: 0,
+            vehicle_id: "generic".to_string(),
         }
     }
 }

@@ -197,6 +197,7 @@ export component Speedometer inherits Rectangle {
     in property <int> redline-rpm;
     in property <int> shift-rpm;
     in property <int> gauge-style;   // 0 = Bar, 1 = Arc, 2 = Lights
+    in property <bool> hybrid;
 
     property <float> max-rpm: root.redline-rpm + 1000;
     property <float> k: min(self.width / 300px, self.height / 224px);
@@ -249,5 +250,13 @@ export component Speedometer inherits Rectangle {
             redline-rpm: root.redline-rpm;
             shift-rpm: root.shift-rpm;
         }
+    }
+    if root.hybrid && root.rpm < 1 && root.speed > 0: Text {
+        text: "EV";
+        x: parent.width - self.width - 8px * root.k;
+        y: 4px * root.k;
+        font-size: 16px * root.k;
+        font-weight: 900;
+        color: Theme.ok;
     }
 }
