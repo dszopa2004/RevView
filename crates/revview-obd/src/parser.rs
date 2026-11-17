@@ -147,3 +147,31 @@ fn parse_codes(response: &str, header: u8) -> Option<Vec<DiagnosticCode>> {
 
     saw_reply.then_some(codes)
 }
+
+/// Returns the bytes after the response mode byte (e.g. 0x61 for a service 21
+/// request), or None if the expected reply isn't present.
+pub fn parse_extra_response(response: &str, mode_header: u8) -> Option<Vec<u8>> {
+    split_messages(response)
+        .into_iter()
+        .find(|m| m.first() == Some(&mode_header))
+        .map(|m| m[1..].to_vec())
+}
+
+#[cfg(test)]
+mod extra_tests {
+    use super::*;
+
+    #[test]
+    fn extracts_data_after_header() {
+        assert_eq!(
+            parse_extra_response("61 01 80 40\r", 0x61),
+            Some(vec![0x01, 0x80, 0x40])
+        );
+    }
+
+    #[test]
+    fn rejects_negative_response_and_noise() {
+        assert!(parse_extra_response("7F 21 12\r", 0x61).is_none());
+        assert!(parse_extra_response("NO DATA\r", 0x61).is_none());
+    }
+}

@@ -6,6 +6,7 @@ pub mod parameters;
 pub mod settings;
 pub mod storage;
 pub mod telemetry;
+pub mod vehicle;
 
 pub use settings::{AppSettings, SpeedUnit, TemperatureUnit};
 pub use storage::SettingsStorage;
