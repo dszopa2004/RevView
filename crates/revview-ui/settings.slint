@@ -36,6 +36,7 @@ component Segmented inherits Rectangle {
         Rectangle {
             border-radius: 6px;
             background: root.value == 0 ? Theme.card-border : transparent;
+
             Text {
                 text: root.left-text;
                 font-size: 15px;
@@ -53,6 +54,7 @@ component Segmented inherits Rectangle {
         Rectangle {
             border-radius: 6px;
             background: root.value == 1 ? Theme.card-border : transparent;
+
             Text {
                 text: root.right-text;
                 font-size: 15px;
@@ -103,6 +105,7 @@ export component Settings inherits Rectangle {
                 Row {
                     SettingCell {
                         label: "Speed Units";
+
                         Segmented {
                             left-text: "KPH";
                             right-text: "MPH";
@@ -113,6 +116,7 @@ export component Settings inherits Rectangle {
 
                     SettingCell {
                         label: "Temperature Units";
+
                         Segmented {
                             left-text: "°C";
                             right-text: "°F";
@@ -125,6 +129,7 @@ export component Settings inherits Rectangle {
                 Row {
                     SettingCell {
                         label: "Redline";
+
                         Stepper {
                             value <=> root.redline-rpm;
                             minimum: 3000;
@@ -137,6 +142,7 @@ export component Settings inherits Rectangle {
 
                     SettingCell {
                         label: "Shift Indicator";
+
                         Stepper {
                             value <=> root.shift-rpm;
                             minimum: 3000;
@@ -151,9 +157,20 @@ export component Settings inherits Rectangle {
                 Row {
                     SettingCell {
                         label: "Gauge Style";
+
                         Dropdown {
                             model: ["Bar", "Arc", "Digital"];
                             current-index <=> root.gauge-style;
+                            selected(i) => { root.settings-changed(); }
+                        }
+                    }
+
+                    SettingCell {
+                        label: "Theme";
+
+                        Dropdown {
+                            model: Theme.names;
+                            current-index <=> Theme.current;
                             selected(i) => { root.settings-changed(); }
                         }
                     }
