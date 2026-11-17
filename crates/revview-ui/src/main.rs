@@ -2,6 +2,7 @@
 mod config;
 
 use std::{
+    sync::atomic::Ordering,
     thread,
     time::{Duration, Instant},
 };
@@ -12,10 +13,17 @@ use revview_core::{
     calculations::{convert_speed, convert_temperature},
     settings::{REDLINE_MAX, REDLINE_MIN},
 };
+
 use revview_obd::{
     connection::{initialize_adapter, open_connection, read_response, send_command},
+    extras::ExtrasPoller,
     parser,
     scheduler::PollingScheduler,
+    vehicles,
+};
+use std::{
+    collections::HashMap,
+    sync::{Arc, atomic::AtomicUsize},
 };
 
 use revview_core::diagnostics::{CodeKind, CodeStatus, DiagnosticReport};
@@ -43,7 +51,17 @@ fn main() -> Result<(), slint::PlatformError> {
         },
         None => AppSettings::default(),
     };
+
     let app = Dashboard::new()?;
+
+    let vehicle_idx = Arc::new(AtomicUsize::new(vehicles::index_of(&settings.vehicle_id)));
+    {
+        let profile = vehicles::ALL[vehicle_idx.load(Ordering::Relaxed)];
+        app.set_vehicle_index(vehicle_idx.load(Ordering::Relaxed) as i32);
+        app.set_hybrid(profile.hybrid);
+        let names: Vec<slint::SharedString> = vehicles::ALL.iter().map(|p| p.name.into()).collect();
+        app.set_vehicle_names(slint::ModelRc::new(slint::VecModel::from(names)));
+    }
 
     // Apply saved settings once, on the main thread.
     app.set_speed_unit(match settings.speed_unit {
@@ -91,10 +109,33 @@ fn main() -> Result<(), slint::PlatformError> {
                 shift_rpm: (ui.get_shift_rpm().max(0) as u32).clamp(REDLINE_MIN, REDLINE_MAX),
                 gauge_style: (ui.get_gauge_style().max(0) as u32),
                 theme: ui.get_theme().max(0) as u32,
+                vehicle_id: vehicles::ALL
+                    [(ui.get_vehicle_index().max(0) as usize).min(vehicles::ALL.len() - 1)]
+                .id
+                .to_string(),
             };
 
             if let Err(e) = storage.save(&settings) {
                 eprintln!("Could not save settings: {}", e);
+            }
+        }
+    });
+
+    app.on_vehicle_changed({
+        let app_weak = app_weak.clone();
+        let vehicle_idx = vehicle_idx.clone();
+        move |i| {
+            let i = (i.max(0) as usize).min(vehicles::ALL.len() - 1);
+            vehicle_idx.store(i, Ordering::Relaxed);
+            let profile = vehicles::ALL[i];
+
+            if let Some(ui) = app_weak.upgrade() {
+                ui.set_redline_rpm(profile.redline_default as i32);
+                ui.set_shift_rpm(profile.shift_default as i32);
+                ui.set_hybrid(profile.hybrid);
+                ui.set_extras(slint::ModelRc::new(slint::VecModel::from(Vec::new())));
+                ui.set_current_view(0); // the extras view may disappear
+                ui.invoke_settings_changed(); // save
             }
         }
     });
@@ -147,6 +188,8 @@ fn main() -> Result<(), slint::PlatformError> {
 
                 // Infinite loop to continuously update telemetry while the app runs
 
+                let mut extras = ExtrasPoller::new(Duration::from_millis(500));
+                let mut extra_values: HashMap<&'static str, f32> = HashMap::new();
                 let mut report = DiagnosticReport::default(); // fresh each connection, never saved
                 let mut scheduler = PollingScheduler::new();
 
@@ -154,6 +197,33 @@ fn main() -> Result<(), slint::PlatformError> {
                     if diag_rx.try_recv().is_ok() {
                         run_diagnostics(&mut *port, &mut report, &app_weak);
                         continue;
+                    }
+
+                    let profile = vehicles::ALL[vehicle_idx.load(Ordering::Relaxed)];
+                    if !profile.extra_pids.is_empty() && extras.due(Instant::now()) {
+                        extras.poll_next(&mut *port, profile, &mut extra_values);
+
+                        let rows: Vec<(String, String, String)> = profile
+                            .extra_pids
+                            .iter()
+                            .filter_map(|p| {
+                                extra_values.get(p.id).map(|v| {
+                                    (p.label.to_string(), format!("{v:.1}"), p.unit.to_string())
+                                })
+                            })
+                            .collect();
+
+                        update_ui(&app_weak, move |ui| {
+                            let model: Vec<ExtraReading> = rows
+                                .into_iter()
+                                .map(|(label, value, unit)| ExtraReading {
+                                    label: label.into(),
+                                    value: value.into(),
+                                    unit: unit.into(),
+                                })
+                                .collect();
+                            ui.set_extras(slint::ModelRc::new(slint::VecModel::from(model)));
+                        });
                     }
 
                     let now = Instant::now();

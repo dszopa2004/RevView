@@ -1,0 +1,49 @@
+import { Theme } from "themes.slint";
+
+export struct ExtraReading {
+    label: string,
+    value: string,
+    unit: string,
+}
+
+export component Extras inherits Rectangle {
+    in property <[ExtraReading]> readings;
+
+    background: Theme.panel-bg;
+
+    Flickable {
+        viewport-height: root.readings.length * 46px + 20px;
+
+        for r[i] in root.readings: Rectangle {
+            x: 10px;
+            y: 10px + i * 46px;
+            width: root.width - 20px;
+            height: 40px;
+            background: Theme.button-bg;
+            border-radius: 8px;
+
+            HorizontalLayout {
+                padding-left: 12px;
+                padding-right: 12px;
+                spacing: 8px;
+
+                Text {
+                    text: r.label;
+                    font-size: 16px;
+                    font-weight: 800;
+                    color: Theme.text-dim;
+                    vertical-alignment: center;
+                    horizontal-stretch: 1;
+                }
+
+                Text {
+                    text: "\{r.value} \{r.unit}";
+                    font-size: 20px;
+                    font-weight: 900;
+                    color: Theme.accent;
+                    vertical-alignment: center;
+                }
+            }
+        }
+    }
+}
