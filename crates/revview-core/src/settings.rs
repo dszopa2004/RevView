@@ -45,6 +45,7 @@ pub struct AppSettings {
     pub redline_rpm: u32,
     pub shift_rpm: u32,
     pub gauge_style: u32,
+    pub theme: u32,
 }
 
 impl Default for AppSettings {
@@ -55,6 +56,7 @@ impl Default for AppSettings {
             redline_rpm: 6500,
             shift_rpm: 6000,
             gauge_style: 0,
+            theme: 0,
         }
     }
 }

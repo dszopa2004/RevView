@@ -1,3 +1,5 @@
+import { Theme } from "themes.slint";
+
 export component Stepper inherits Rectangle {
     in-out property <int> value;
     in property <int> minimum: 0;
@@ -6,8 +8,8 @@ export component Stepper inherits Rectangle {
     in property <string> suffix: "";
     callback edited(int);
 
-    background: #171a20;
-    border-color: #354152;
+    background: Theme.window-bg;
+    border-color: Theme.card-border;
     border-width: 1px;
     border-radius: 8px;
 
@@ -19,15 +21,15 @@ export component Stepper inherits Rectangle {
             width: 36px;
             height: 36px;
             border-radius: 6px;
-            background: minus-area.pressed ? #354152
-                : minus-area.has-hover && root.value > root.minimum ? #252b36
+            background: minus-area.pressed ? Theme.card-border
+                : minus-area.has-hover && root.value > root.minimum ? Theme.button-bg
                 : transparent;
 
             Text {
                 text: "−";
                 font-size: 20px;
                 font-weight: 800;
-                color: root.value <= root.minimum ? #3d4655 : #8b95a5;
+                color: root.value <= root.minimum ? Theme.track : Theme.text-dim;
                 horizontal-alignment: center;
                 vertical-alignment: center;
             }
@@ -50,7 +52,7 @@ export component Stepper inherits Rectangle {
                 text: "\{root.value}\{root.suffix}";
                 font-size: 15px;
                 font-weight: 800;
-                color: #00ffcc;
+                color: Theme.accent;
                 horizontal-alignment: center;
                 vertical-alignment: center;
             }
@@ -61,15 +63,15 @@ export component Stepper inherits Rectangle {
             width: 36px;
             height: 36px;
             border-radius: 6px;
-            background: plus-area.pressed ? #354152
-                : plus-area.has-hover && root.value < root.maximum ? #252b36
+            background: plus-area.pressed ? Theme.card-border
+                : plus-area.has-hover && root.value < root.maximum ? Theme.button-bg
                 : transparent;
 
             Text {
                 text: "+";
                 font-size: 20px;
                 font-weight: 800;
-                color: root.value >= root.maximum ? #3d4655 : #8b95a5;
+                color: root.value >= root.maximum ? Theme.track : Theme.text-dim;
                 horizontal-alignment: center;
                 vertical-alignment: center;
             }

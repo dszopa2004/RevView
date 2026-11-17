@@ -1,3 +1,5 @@
+import { Theme } from "themes.slint";
+
 export struct DiagnosticEntry {
     code: string,   // "P0133"
     kind: string,   // "Stored" | "Pending" | "Permanent"
@@ -9,8 +11,8 @@ component ActionButton inherits Rectangle {
     in property <length> text-size: 16px;
     callback clicked();
 
-    background: touch.pressed ? #45475a : #2a2b36;
-    border-color: #354152;
+    background: touch.pressed ? Theme.button-pressed : Theme.button-bg;
+    border-color: Theme.card-border;
     border-width: 1px;
     border-radius: 8px;
 
@@ -18,7 +20,7 @@ component ActionButton inherits Rectangle {
         text: root.text;
         font-size: root.text-size;
         font-weight: 800;
-        color: #00ffcc;
+        color: Theme.accent;
         horizontal-alignment: center;
         vertical-alignment: center;
     }
@@ -32,14 +34,14 @@ component ActionButton inherits Rectangle {
 component IndeterminateBar inherits Rectangle {
     property <float> t: mod(animation-tick() / 1.4s, 1.0);
 
-    background: #2e3748;
+    background: Theme.track;
     border-radius: self.height / 2;
     clip: true;
 
     Rectangle {
         width: parent.width * 0.35;
         x: -self.width + (parent.width + self.width) * root.t;
-        background: #00ffcc;
+        background: Theme.accent;
         border-radius: self.height / 2;
     }
 }
@@ -65,7 +67,7 @@ export component Diagnostics inherits Rectangle {
             text: "Diagnostics";
             font-size: 24px * root.k;
             font-weight: 900;
-            color: #ffffff;
+            color: Theme.text;
             horizontal-alignment: center;
         }
 
@@ -75,7 +77,7 @@ export component Diagnostics inherits Rectangle {
                 : "Reads stored, pending and permanent codes.";
             font-size: 12px * root.k;
             font-weight: 800;
-            color: root.state == 3 ? #ef4444 : #8b95a5;
+            color: root.state == 3 ? Theme.danger : Theme.text-dim;
             horizontal-alignment: center;
             wrap: word-wrap;
         }
@@ -105,7 +107,7 @@ export component Diagnostics inherits Rectangle {
             text: "Reading codes…";
             font-size: 16px * root.k;
             font-weight: 800;
-            color: #ffffff;
+            color: Theme.text;
             horizontal-alignment: center;
         }
 
@@ -128,7 +130,7 @@ export component Diagnostics inherits Rectangle {
             text: "No trouble codes found";
             font-size: 20px * root.k;
             font-weight: 900;
-            color: #4ade80;
+            color: Theme.ok;
             horizontal-alignment: center;
         }
 
@@ -162,7 +164,7 @@ export component Diagnostics inherits Rectangle {
                     : "\{root.entries.length} codes found";
                 font-size: 18px * root.k;
                 font-weight: 900;
-                color: #fbbf24;
+                color: Theme.warn;
                 vertical-alignment: center;
                 horizontal-stretch: 1;
             }
@@ -191,12 +193,12 @@ export component Diagnostics inherits Rectangle {
                     width: flick.width - 10px * root.k;
                     height: root.row-height;
                     y: i * (root.row-height + root.row-spacing);
-                    background: #2a2b36;
+                    background: Theme.button-bg;
                     border-radius: 8px * root.k;
 
-                    property <color> accent: entry.kind == "Pending" ? #fbbf24
-                        : entry.kind == "Permanent" ? #a78bfa
-                        : #ef4444;
+                    property <color> accent: entry.kind == "Pending" ? Theme.warn
+                        : entry.kind == "Permanent" ? Theme.info
+                        : Theme.danger;
 
                     HorizontalLayout {
                         padding-left: 12px * root.k;
@@ -207,7 +209,7 @@ export component Diagnostics inherits Rectangle {
                             text: entry.code;
                             font-size: 20px * root.k;
                             font-weight: 900;
-                            color: #ffffff;
+                            color: Theme.text;
                             vertical-alignment: center;
                             horizontal-stretch: 1;
                         }
@@ -242,7 +244,7 @@ export component Diagnostics inherits Rectangle {
                 x: parent.width - self.width;
                 y: flick.height * (-flick.content-y / flick.content-height);
                 height: flick.height * (flick.height / flick.content-height);
-                background: #354152;
+                background: Theme.card-border;
                 border-radius: self.width / 2;
             }
         }
