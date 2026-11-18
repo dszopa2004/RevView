@@ -12,8 +12,6 @@ revview-obd = { path = "../revview-obd" }
 serialport = "4.10.1"
 slint = "1"
 toml = "1.2.1"
-vehicle = "0.1.0"
 
 [build-dependencies]
 slint-build = "1"
-directories = "6"
