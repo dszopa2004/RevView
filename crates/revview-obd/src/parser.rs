@@ -19,7 +19,9 @@ fn parse_obd_response(response: &str, pid: &str) -> Option<Vec<u8>> {
     // Stop if the next character is not valid hexadecimal data.
     let mut bytes = Vec::new();
 
-    for pair in data.as_bytes().chunks_exact(2) {
+    let (pairs, _) = data.as_bytes().as_chunks::<2>();
+
+    for pair in pairs {
         let pair = std::str::from_utf8(pair).ok()?;
         bytes.push(u8::from_str_radix(pair, 16).ok()?);
     }
@@ -134,8 +136,10 @@ fn parse_codes(response: &str, header: u8) -> Option<Vec<DiagnosticCode>> {
             data
         };
 
-        for pair in data.chunks_exact(2) {
-            if pair == [0, 0] {
+        let (pairs, _) = data.as_chunks::<2>();
+
+        for pair in pairs {
+            if *pair == [0, 0] {
                 continue; // padding
             }
             let code = decode_dtc(pair[0], pair[1]);

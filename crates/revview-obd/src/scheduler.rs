@@ -111,3 +111,9 @@ impl PollingScheduler {
         ready_at.saturating_duration_since(now)
     }
 }
+
+impl Default for PollingScheduler {
+    fn default() -> Self {
+        Self::new()
+    }
+}

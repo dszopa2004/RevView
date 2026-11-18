@@ -144,10 +144,10 @@ fn main() -> Result<(), slint::PlatformError> {
         let app_weak = app_weak.clone();
         move || {
             // If the OBD thread has exited (no adapter), nobody is listening.
-            if diag_tx.send(()).is_err() {
-                if let Some(ui) = app_weak.upgrade() {
-                    ui.set_diag_state(3);
-                }
+            if diag_tx.send(()).is_err()
+                && let Some(ui) = app_weak.upgrade()
+            {
+                ui.set_diag_state(3);
             }
         }
     });

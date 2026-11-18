@@ -59,7 +59,7 @@ impl ExtrasPoller {
 
     pub fn due(&self, now: Instant) -> bool {
         self.last
-            .map_or(true, |t| now.duration_since(t) >= self.interval)
+            .is_none_or(|t| now.duration_since(t) >= self.interval)
     }
 
     /// Caller must check `profile.extra_pids` is non-empty first.
