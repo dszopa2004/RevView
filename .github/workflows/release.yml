@@ -1,0 +1,80 @@
+name: Release
+
+on:
+  push:
+    branches:
+      - release
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    name: Build Release
+    runs-on: ubuntu-24.04
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v6
+
+      - name: Install system dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y \
+            pkg-config \
+            libfontconfig1-dev \
+            libudev-dev
+
+      - name: Install Rust toolchain
+        uses: actions-rust-lang/setup-rust-toolchain@v2
+        with:
+          cache: true
+
+      - name: Apply production UI conditions
+        run: |
+          python3 <<'PY'
+          from pathlib import Path
+
+          replacements = {
+              "!root.obd-initialized && !root.show-settings":
+                  "root.obd-initialized && !root.show-settings",
+              "if root.obd-initialized: Rectangle":
+                  "if !root.obd-initialized: Rectangle",
+          }
+
+          matches = []
+
+          for path in Path("crates").rglob("*.slint"):
+              contents = path.read_text()
+              counts = {
+                  old: contents.count(old)
+                  for old in replacements
+              }
+
+              if any(counts.values()):
+                  matches.append((path, contents, counts))
+
+          if len(matches) != 1:
+              raise SystemExit(
+                  f"Expected both conditions in exactly one Slint file; "
+                  f"found {len(matches)} matching files."
+              )
+
+          path, contents, counts = matches[0]
+
+          if any(count != 1 for count in counts.values()):
+              raise SystemExit(
+                  f"Expected each condition exactly once in {path}; "
+                  f"found {counts}"
+              )
+
+          for old, new in replacements.items():
+              contents = contents.replace(old, new, 1)
+
+          path.write_text(contents)
+
+          print(f"Applied production UI conditions to {path}")
+          PY
+
+      - name: Build release
+        run: cargo build --workspace --release --locked
